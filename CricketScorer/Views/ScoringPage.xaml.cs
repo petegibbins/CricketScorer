@@ -24,7 +24,7 @@ public partial class ScoringPage : ContentPage
     private void UpdateScoreDisplay()
     {
         ScoreLabel.Text = $"Score: {currentMatch.Runs}/{currentMatch.Wickets}";
-        OverLabel.Text = $"Overs: {currentMatch.OversDetails.Count}";
+        OverLabel.Text = $"Overs: {currentMatch.OversDetails.Count}/{currentMatch.TotalOvers}";
 
         var overs = currentMatch.OversDetails.ToList();
 
@@ -57,7 +57,8 @@ public partial class ScoringPage : ContentPage
         if (overs.Count >= 1)
         {
             var lastOver = overs.Last();
-            LastOver1Label.Text = $"Over {overs.Count}: " + string.Join(" ", lastOver.Balls.Select(b => b.ToString()));
+            //LastOver1Label.Text = $"Over {overs.Count}: " + string.Join(" ", lastOver.Balls.Select(b => b.ToString()));
+            LastOver1Label.FormattedText = BuildOverFormattedString(overs.Count >= 1 ? overs[^1] : null, overs.Count);
         }
         else
         {
@@ -67,12 +68,44 @@ public partial class ScoringPage : ContentPage
         if (overs.Count >= 2)
         {
             var secondLastOver = overs[^2];
-            LastOver2Label.Text = $"Over {overs.Count - 1}: " + string.Join(" ", secondLastOver.Balls.Select(b => b.ToString()));
+            LastOver2Label.FormattedText = BuildOverFormattedString(overs.Count >= 2 ? overs[^2] : null, overs.Count - 1);
         }
         else
         {
             LastOver2Label.Text = "-";
         }
+    }
+
+    private FormattedString BuildOverFormattedString(Over over, int overNumber)
+    {
+        var formatted = new FormattedString();
+
+        if (over == null || over.Balls.Count == 0)
+        {
+            formatted.Spans.Add(new Span { Text = "-" });
+            return formatted;
+        }
+
+        formatted.Spans.Add(new Span
+        {
+            Text = $"Over {overNumber}: ",
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Colors.DarkBlue
+        });
+
+        foreach (var ball in over.Balls)
+        {
+            string ballText = ball.ToString() + " ";
+
+            formatted.Spans.Add(new Span
+            {
+                Text = ballText,
+                TextColor = ball.IsWicket ? Colors.Red : Colors.Black,
+                FontAttributes = FontAttributes.None
+            });
+        }
+
+        return formatted;
     }
 
     private void AddRuns(int runs, bool isWide = false, bool isNoBall = false)
@@ -134,7 +167,7 @@ public partial class ScoringPage : ContentPage
         }
     }
 
-    private void EndOver()
+    private async void EndOver()
     {
         if (currentOver.Balls.Count > 0)
         {
@@ -144,6 +177,14 @@ public partial class ScoringPage : ContentPage
 
         ballsInCurrentOver = 0;
         UpdateScoreDisplay();
+        if (currentMatch.OversDetails.Count >= currentMatch.TotalOvers)
+        {
+            bool endNow = await DisplayAlert("Overs Complete", "The maximum number of overs is reached. End the innings now?", "Yes", "No");
+            if (endNow)
+            {
+                await EndInningsManually();
+            }
+        }
     }
 
     private void OnWideClicked(object sender, EventArgs e)
@@ -304,4 +345,37 @@ public partial class ScoringPage : ContentPage
             btn.ScaleTo(1.0, 50); // return to normal size
         }
     }
+
+    private async Task EndInningsManually()
+    {
+        if (currentOver.Balls.Count > 0)
+        {
+            currentMatch.OversDetails.Add(currentOver);
+            currentOver = new Over();
+        }
+
+        if (isFirstInnings)
+        {
+            isFirstInnings = false;
+
+            teamATotalRuns = currentMatch.Runs;
+            teamAWickets = currentMatch.Wickets;
+            teamAOvers = currentMatch.OversDetails.Count;
+
+            currentMatch.Runs = 200; // Reset for Team B innings
+            currentMatch.Wickets = 0;
+            currentMatch.OversDetails.Clear();
+            ballsInCurrentOver = 0;
+            currentOver = new Over();
+
+            await DisplayAlert("New Innings", $"{currentMatch.TeamB} now batting to chase {teamATotalRuns} runs!", "OK");
+            UpdateScoreDisplay();
+        }
+        else
+        {
+            // Both innings complete
+            await Navigation.PushAsync(new SummaryPage(currentMatch, teamATotalRuns, teamAWickets, teamAOvers));
+        }
+    }
+
 }
