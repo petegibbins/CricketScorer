@@ -4,27 +4,53 @@
              x:Class="CricketScorer.Views.ScoringPage"
              Title="ScoringPage">
 
-    <VerticalStackLayout Padding="20" Spacing="15" HorizontalOptions="Center">
+
+    <VerticalStackLayout Padding="20" Spacing="20">
 
         <!-- Score Display -->
         <Label x:Name="ScoreLabel" Text="Score: 0/0" FontSize="36" HorizontalOptions="Center" />
         <Label x:Name="OverLabel" Text="Overs: 0" FontSize="24" HorizontalOptions="Center" />
+        <Label x:Name="TargetLabel" FontSize="20" TextColor="DarkGreen" HorizontalOptions="Center" />
+        <Frame CornerRadius="20" Padding="15" BackgroundColor="#f0f0f0" HasShadow="True" Margin="0,10,0,10">
+            <VerticalStackLayout Spacing="20">
+                <!-- Batting Actions -->
+                <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
+                    <Grid.Children>
+                        <Button Text="Dot" Grid.Column="0" Clicked="OnDotClicked" Pressed="OnButtonPressed" Released="OnButtonReleased" Style="{StaticResource DefaultButtonStyle}" />
+                        <Button Text="+1 Run" Grid.Column="1" Clicked="OnOneRunClicked" Style="{StaticResource DefaultButtonStyle}" />
+                        <Button Text="+4 Runs" Grid.Column="2" Clicked="OnFourRunsClicked" Style="{StaticResource DefaultButtonStyle}" />
+                        <Button Text="+6 Runs" Grid.Column="3" Clicked="OnSixRunsClicked" Style="{StaticResource DefaultButtonStyle}" />
+                    </Grid.Children>
+                </Grid>
 
-        <!-- Action Buttons -->
-        <Button Text="Dot" Clicked="OnDotClicked" />
-        <Button Text="+1 Run" Clicked="OnOneRunClicked" />
-        <Button Text="+4 Runs" Clicked="OnFourRunsClicked" />
-        <Button Text="+6 Runs" Clicked="OnSixRunsClicked" />
-        <Button Text="Wide" Clicked="OnWideClicked" />
-        <Button Text="No Ball" Clicked="OnNoBallClicked" />
-        <Button Text="Wicket" BackgroundColor="Red" TextColor="White" Clicked="OnWicketClicked" />
-        <Button Text="End Over" BackgroundColor="DarkGray" Clicked="OnEndOverClicked" />
-        <Button Text="Undo Last Ball" BackgroundColor="Orange" TextColor="Black" Clicked="OnUndoClicked" />
-        <Button Text="End Innings" BackgroundColor="Green" TextColor="White" Clicked="OnEndInningsClicked" />
+                <!-- Extras -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
+                    <Grid.Children>
+                        <Button Text="Wide" Grid.Column="0" Clicked="OnWideClicked" Style="{StaticResource DefaultButtonStyle}" />
+                        <Button Text="No Ball" Grid.Column="1" Clicked="OnNoBallClicked" Style="{StaticResource DefaultButtonStyle}" />
+                    </Grid.Children>
+                </Grid>
 
-        <Label Text="Last 2 Overs" FontAttributes="Bold" />
+                <!-- Match Actions -->
+                <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
+                    <Grid.Children>
+                        <Button Text="Wicket" BackgroundColor="Red" TextColor="White" Grid.Column="0" Clicked="OnWicketClicked" Style="{StaticResource WicketButtonStyle}" />
+                        <Button Text="End Over" BackgroundColor="DarkGray" TextColor="White" Grid.Column="1" Clicked="OnEndOverClicked" Style="{StaticResource EndOverButtonStyle}" />
+                        <Button Text="Undo" BackgroundColor="Orange" TextColor="Black" Grid.Column="2" Clicked="OnUndoClicked" Style="{StaticResource UndoButtonStyle}" />
+                    </Grid.Children>
+                </Grid>
 
-        <Label x:Name="LastOver1Label" Text="-" FontSize="18" />
-        <Label x:Name="LastOver2Label" Text="-" FontSize="18" />
+                <!-- End Innings Button -->
+                <Button Text="End Innings" BackgroundColor="Green" TextColor="White" Clicked="OnEndInningsClicked" Style="{StaticResource EndInningsButtonStyle}" />
+            </VerticalStackLayout>
+        </Frame>
+        <!-- Last Two Overs -->
+        <VerticalStackLayout Padding="10" Spacing="5">
+            <Label Text="Last 2 Overs" FontAttributes="Bold" />
+            <Label x:Name="LastOver1Label" Text="-" FontSize="18" />
+            <Label x:Name="LastOver2Label" Text="-" FontSize="18" />
+        </VerticalStackLayout>
+
     </VerticalStackLayout>
+
 </ContentPage>

@@ -12,6 +12,7 @@ public partial class ScoringPage : ContentPage
     private int teamATotalRuns = 0;
     private int teamAWickets = 0;
     private int teamAOvers = 0;
+    private bool matchEnded = false;
 
     public ScoringPage(Match match)
     {
@@ -26,6 +27,26 @@ public partial class ScoringPage : ContentPage
         OverLabel.Text = $"Overs: {currentMatch.OversDetails.Count}";
 
         var overs = currentMatch.OversDetails.ToList();
+
+
+        if (!isFirstInnings)
+        {
+            int target = teamATotalRuns + 1; // Must beat Team A's total
+            int runsNeeded = target - currentMatch.Runs;
+
+            if (runsNeeded > 0)
+            {
+                TargetLabel.Text = $"Needs {runsNeeded} more to win";
+            }
+            else
+            {
+                TargetLabel.Text = $"{currentMatch.TeamB} has won!";
+            }
+        }
+        else
+        {
+            TargetLabel.Text = ""; // Hide during first innings
+        }
 
         // Add the current over (even if incomplete) to the list temporarily
         if (currentOver.Balls.Count > 0)
@@ -56,12 +77,13 @@ public partial class ScoringPage : ContentPage
 
     private void AddRuns(int runs, bool isWide = false, bool isNoBall = false)
     {
+        if (matchEnded) return; // Prevent scoring if match already won
         currentMatch.Runs += runs;
 
         ballsInCurrentOver++;
 
         currentOver.Balls.Add(new Ball { Runs = runs, IsWide = isWide, IsNoBall = isNoBall });
-
+        CheckForMatchWin();
         CheckOverComplete();
         UpdateScoreDisplay();
     }
@@ -83,6 +105,7 @@ public partial class ScoringPage : ContentPage
 
     private async void OnWicketClicked(object sender, EventArgs e)
     {
+        if (matchEnded) return; // Prevent scoring if match already won
         currentMatch.Wickets++;
         currentMatch.Runs -= 5; // Softball cricket rule: lose 5 runs
         if (currentMatch.Runs < 0)
@@ -92,12 +115,14 @@ public partial class ScoringPage : ContentPage
         currentOver.Balls.Add(new Ball { Runs = 0, IsWicket = true });
 
         await DisplayAlert("Wicket!", "-5 runs penalty applied.", "OK");
+        CheckForMatchWin();
         CheckOverComplete();
         UpdateScoreDisplay();
     }
 
     private void OnEndOverClicked(object sender, EventArgs e)
     {
+        if (matchEnded) return; // Prevent scoring if match already won
         EndOver();
     }
 
@@ -204,6 +229,7 @@ public partial class ScoringPage : ContentPage
     }
     private async void OnEndInningsClicked(object sender, EventArgs e)
     {
+        if (matchEnded) return; // Prevent scoring if match already won
         bool confirm = await DisplayAlert("End Innings", "Are you sure you want to end this innings?", "Yes", "No");
 
         if (confirm)
@@ -242,5 +268,40 @@ public partial class ScoringPage : ContentPage
             }
         }
     }
+    private async void CheckForMatchWin()
+    {
+        if (!isFirstInnings)
+        {
+            int target = teamATotalRuns + 1;
 
+            if (currentMatch.Runs >= target && !matchEnded)
+            {
+                matchEnded = true;
+
+                await DisplayAlert("Match Won", $"{currentMatch.TeamB} has won the match!", "OK");
+
+                bool endNow = await DisplayAlert("End Match?", "Would you like to end the match now?", "Yes", "No");
+                if (endNow)
+                {
+                    await Navigation.PushAsync(new SummaryPage(currentMatch, teamATotalRuns, teamAWickets, teamAOvers));
+                }
+            }
+        }
+    }
+
+    private void OnButtonPressed(object sender, EventArgs e)
+    {
+        if (sender is Button btn)
+        {
+            btn.ScaleTo(0.95, 50); // shrink to 95% size in 50ms
+        }
+    }
+
+    private void OnButtonReleased(object sender, EventArgs e)
+    {
+        if (sender is Button btn)
+        {
+            btn.ScaleTo(1.0, 50); // return to normal size
+        }
+    }
 }
