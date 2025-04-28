@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CricketScorer.Views.SummaryPage"
+             Title="SummaryPage">
+    <VerticalStackLayout Padding="20" Spacing="15">
+        <Label x:Name="MatchResultLabel" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+
+        <Label x:Name="DetailedScoreLabel" FontSize="18" HorizontalOptions="Center" />
+
+        <Button Text="Back to Home" Clicked="OnBackHomeClicked" />
+    </VerticalStackLayout>
+</ContentPage>
