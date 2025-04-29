@@ -1,3 +1,4 @@
+using CricketScorer.Helpers;
 using CricketScorer.Models;
 
 namespace CricketScorer.Views;
@@ -330,19 +331,19 @@ public partial class ScoringPage : ContentPage
         }
     }
 
-    private void OnButtonPressed(object sender, EventArgs e)
+    private async void OnButtonPressed(object sender, EventArgs e)
     {
-        if (sender is Button btn)
+        if(sender is VisualElement element)
         {
-            btn.ScaleTo(0.95, 50); // shrink to 95% size in 50ms
+            await ButtonAnimations.ShrinkOnPress(element);
         }
     }
 
-    private void OnButtonReleased(object sender, EventArgs e)
+    private async void OnButtonReleased(object sender, EventArgs e)
     {
-        if (sender is Button btn)
+        if (sender is VisualElement element)
         {
-            btn.ScaleTo(1.0, 50); // return to normal size
+            await ButtonAnimations.ExpandOnRelease(element);
         }
     }
 
@@ -378,4 +379,29 @@ public partial class ScoringPage : ContentPage
         }
     }
 
+    private async void OnCustomRunClicked(object sender, EventArgs e)
+    {
+        if (matchEnded) return;
+
+        string result = await DisplayPromptAsync("Custom Runs", "Enter number of runs:",
+                                                  accept: "OK", cancel: "Cancel",
+                                                  keyboard: Keyboard.Numeric);
+
+        if (!string.IsNullOrWhiteSpace(result))
+        {
+            if (int.TryParse(result, out int customRuns) && customRuns >= 0)
+            {
+                AddRuns(customRuns);
+            }
+            else
+            {
+                await DisplayAlert("Invalid Input", "Please enter a valid number of runs.", "OK");
+            }
+        }
+    }
+
+    private void OnTwoRunsClicked(object sender, EventArgs e)
+    {
+        AddRuns(2);
+    }
 }

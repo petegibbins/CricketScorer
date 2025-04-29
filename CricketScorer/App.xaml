@@ -37,6 +37,7 @@
             <!-- Specific Colors for certain buttons -->
             <Style x:Key="WicketButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
                 <Setter Property="BackgroundColor" Value="Red" />
+                <Setter Property="FontSize" Value="18" />
                 <Setter Property="VisualStateManager.VisualStateGroups">
                     <VisualStateGroupList>
                         <VisualStateGroup x:Name="CommonStates">
@@ -55,10 +56,12 @@
             <Style x:Key="UndoButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
                 <Setter Property="BackgroundColor" Value="Orange" />
                 <Setter Property="TextColor" Value="Black" />
+                <Setter Property="FontSize" Value="18" />
             </Style>
 
             <Style x:Key="EndOverButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
                 <Setter Property="BackgroundColor" Value="DarkGray" />
+                <Setter Property="FontSize" Value="18" />
             </Style>
 
             <Style x:Key="EndInningsButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">

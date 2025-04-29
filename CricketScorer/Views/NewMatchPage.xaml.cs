@@ -1,3 +1,4 @@
+using CricketScorer.Helpers;
 using CricketScorer.Models;
 
 namespace CricketScorer.Views;
@@ -34,5 +35,21 @@ public partial class NewMatchPage : ContentPage
         };
 
         await Navigation.PushAsync(new ScoringPage(match));
+    }
+
+    private async void OnButtonPressed(object sender, EventArgs e)
+    {
+        if (sender is VisualElement element)
+        {
+            await ButtonAnimations.ShrinkOnPress(element);
+        }
+    }
+
+    private async void OnButtonReleased(object sender, EventArgs e)
+    {
+        if (sender is VisualElement element)
+        {
+            await ButtonAnimations.ExpandOnRelease(element);
+        }
     }
 }

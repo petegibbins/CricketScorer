@@ -13,35 +13,40 @@
         <Label x:Name="TargetLabel" FontSize="20" TextColor="DarkGreen" HorizontalOptions="Center" />
         <Frame CornerRadius="20" Padding="15" BackgroundColor="#f0f0f0" HasShadow="True" Margin="0,10,0,10">
             <VerticalStackLayout Spacing="20">
-                <!-- Batting Actions -->
-                <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
+                <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" ColumnSpacing="10" RowSpacing="10">
                     <Grid.Children>
-                        <Button Text="Dot" Grid.Column="0" Clicked="OnDotClicked" Pressed="OnButtonPressed" Released="OnButtonReleased" Style="{StaticResource DefaultButtonStyle}" />
-                        <Button Text="+1 Run" Grid.Column="1" Clicked="OnOneRunClicked" Style="{StaticResource DefaultButtonStyle}" />
-                        <Button Text="+4 Runs" Grid.Column="2" Clicked="OnFourRunsClicked" Style="{StaticResource DefaultButtonStyle}" />
-                        <Button Text="+6 Runs" Grid.Column="3" Clicked="OnSixRunsClicked" Style="{StaticResource DefaultButtonStyle}" />
+                        <Button Text="Dot" Style="{StaticResource DefaultButtonStyle}" Clicked="OnDotClicked" Grid.Column="0" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        <Button Text="+1 Run" Style="{StaticResource DefaultButtonStyle}" Clicked="OnOneRunClicked" Grid.Column="1" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        <Button Text="+2 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnTwoRunsClicked" Grid.Column="2" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        <Button Text="+4 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnFourRunsClicked" Grid.Column="3" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
                     </Grid.Children>
                 </Grid>
 
-                <!-- Extras -->
-                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
+                <!-- second row -->
+                <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" ColumnSpacing="10" RowSpacing="10">
                     <Grid.Children>
-                        <Button Text="Wide" Grid.Column="0" Clicked="OnWideClicked" Style="{StaticResource DefaultButtonStyle}" />
-                        <Button Text="No Ball" Grid.Column="1" Clicked="OnNoBallClicked" Style="{StaticResource DefaultButtonStyle}" />
+                        <Button Text="+6 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnSixRunsClicked" Grid.Column="0" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        <Button Text="Wide" Style="{StaticResource DefaultButtonStyle}" Clicked="OnWideClicked" Grid.Column="1" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        <Button Text="NB" Style="{StaticResource DefaultButtonStyle}" Clicked="OnNoBallClicked" Grid.Column="2" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        <Button Text="Custom" Style="{StaticResource DefaultButtonStyle}" Clicked="OnCustomRunClicked" Grid.Column="3" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
                     </Grid.Children>
                 </Grid>
 
                 <!-- Match Actions -->
-                <Grid ColumnDefinitions="*,2*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
+                <Grid ColumnDefinitions="*,1.2*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
                     <Grid.Children>
-                        <Button Text="Wicket" BackgroundColor="Red" TextColor="White" Grid.Column="0" Clicked="OnWicketClicked" Style="{StaticResource WicketButtonStyle}" />
-                        <Button Text="End Over" BackgroundColor="DarkGray" TextColor="White" Grid.Column="1" Clicked="OnEndOverClicked" Style="{StaticResource EndOverButtonStyle}" />
-                        <Button Text="Undo" BackgroundColor="Orange" TextColor="Black" Grid.Column="2" Clicked="OnUndoClicked" Style="{StaticResource UndoButtonStyle}" />
+                        <Button Text="Wicket" BackgroundColor="Red" TextColor="White" Grid.Column="0" Clicked="OnWicketClicked" Style="{StaticResource WicketButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        <Button Text="End Over" BackgroundColor="DarkGray" TextColor="White" Grid.Column="1" Clicked="OnEndOverClicked" Style="{StaticResource EndOverButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        <Button Style="{StaticResource UndoButtonStyle}" Clicked="OnUndoClicked" Grid.Column="2" ContentLayout="Top,0" Pressed="OnButtonPressed" Released="OnButtonReleased">
+                            <Button.ImageSource>
+                                <FileImageSource File="undo.png" />
+                            </Button.ImageSource>
+                        </Button>
                     </Grid.Children>
                 </Grid>
 
                 <!-- End Innings Button -->
-                <Button Text="End Innings" BackgroundColor="Green" TextColor="White" Clicked="OnEndInningsClicked" Style="{StaticResource EndInningsButtonStyle}" />
+                <Button Text="End Innings" BackgroundColor="Green" TextColor="White" Clicked="OnEndInningsClicked" Style="{StaticResource EndInningsButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
             </VerticalStackLayout>
         </Frame>
         <!-- Last Two Overs -->
