@@ -21,6 +21,11 @@ namespace CricketScorer.Models
         public List<Over> OversDetails { get; set; } = [];
         public int CurrentPairIndex { get; set; } = 0; // 0 = first pair
         public int OversPerPair { get; set; } = 2;      // Change pair every 2 overs
+        public List<string> TeamABowlers { get; set; } = new();
+        public List<string> TeamBBowlers { get; set; } = new();
+
+        // Track who bowled each over
+        public List<string> OverBowlers { get; set; } = new();
         public List<string> GetCurrentBatters(bool isFirstInnings)
         {
             return isFirstInnings ? TeamABatters : TeamBBatters;

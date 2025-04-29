@@ -14,6 +14,7 @@ public partial class ScoringPage : ContentPage
     private int teamAWickets = 0;
     private int teamAOvers = 0;
     private bool matchEnded = false;
+    private string currentBowler;
 
     public ScoringPage(Match match)
     {
@@ -31,6 +32,12 @@ public partial class ScoringPage : ContentPage
 
         // Fade to fully visible over 500 milliseconds
         await this.FadeTo(1, 500, Easing.CubicInOut);
+
+        if (currentMatch.OversDetails.Count == 0 && string.IsNullOrEmpty(currentBowler))
+        {
+            await SelectNextBowler();
+            UpdateScoreDisplay();
+        }
     }
 
     private void UpdateScoreDisplay()
@@ -197,6 +204,7 @@ public partial class ScoringPage : ContentPage
         if (currentOver.Balls.Count > 0)
         {
             currentMatch.OversDetails.Add(currentOver);
+            currentMatch.OverBowlers.Add(currentBowler);
             currentOver = new Over(); // Start a fresh over
         }
 
@@ -223,6 +231,30 @@ public partial class ScoringPage : ContentPage
                 await EndInningsManually();
             }
         }
+        await SelectNextBowler();
+    }
+
+    private async Task SelectNextBowler()
+    {
+        var bowlers = isFirstInnings ? currentMatch.TeamBBatters : currentMatch.TeamABatters; // Bowling team is the fielding side
+
+        if (bowlers.Count == 0)
+        {
+            await DisplayAlert("No Bowlers", "No bowlers available!", "OK");
+            return;
+        }
+
+        string selectedBowler = await DisplayActionSheet("Select Bowler for New Over", "Cancel", null, bowlers.ToArray());
+
+        if (selectedBowler != null && selectedBowler != "Cancel")
+        {
+            currentBowler = selectedBowler;
+            UpdateBowlerDisplay();
+        }
+    }
+    private void UpdateBowlerDisplay()
+    {
+        CurrentBowlerLabel.Text = $"Bowler: {currentBowler}";
     }
 
     private void OnWideClicked(object sender, EventArgs e)
@@ -370,7 +402,7 @@ public partial class ScoringPage : ContentPage
 
     private async void OnButtonPressed(object sender, EventArgs e)
     {
-        if(sender is VisualElement element)
+        if (sender is VisualElement element)
         {
             await ButtonAnimations.ShrinkOnPress(element);
         }

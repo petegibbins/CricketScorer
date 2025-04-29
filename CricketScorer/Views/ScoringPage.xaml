@@ -6,10 +6,12 @@
 
 
     <VerticalStackLayout Padding="20" Spacing="20">
+        <!-- Batting bowling info -->
         <Label x:Name="BattingTeamLabel" FontSize="22" HorizontalOptions="Center" />
         <Label Text="Current Batters:" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" />
         <Label x:Name="BattingPairLabel" FontSize="22" HorizontalOptions="Center" />
-
+        <Label Text="Current Bowler:" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" />
+        <Label x:Name="CurrentBowlerLabel" FontSize="22" HorizontalOptions="Center" />
         <!-- Score Display -->
         <Label x:Name="ScoreLabel" Text="Score: 0/0" FontSize="36" HorizontalOptions="Center" />
         <Label x:Name="OverLabel" Text="Overs: 0" FontSize="24" HorizontalOptions="Center" />
