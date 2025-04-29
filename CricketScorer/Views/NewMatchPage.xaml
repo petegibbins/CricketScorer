@@ -8,6 +8,7 @@
         <Entry x:Name="TeamAEntry" Placeholder="Enter Team A Name" />
         <Entry x:Name="TeamBEntry" Placeholder="Enter Team B Name" />
         <Entry x:Name="OversEntry" Placeholder="Enter Number of Overs" Keyboard="Numeric" />
+        <Entry x:Name="RunsEntry" Placeholder="Enter Starting Runs" Text="200" Keyboard="Numeric" />
 
         <Button Text="Start Scoring" Clicked="OnStartScoringClicked" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
     </VerticalStackLayout>

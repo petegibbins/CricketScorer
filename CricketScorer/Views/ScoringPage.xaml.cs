@@ -22,13 +22,37 @@ public partial class ScoringPage : ContentPage
         UpdateScoreDisplay();
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // Start page invisible
+        this.Opacity = 0;
+
+        // Fade to fully visible over 500 milliseconds
+        await this.FadeTo(1, 500, Easing.CubicInOut);
+    }
+
     private void UpdateScoreDisplay()
     {
         ScoreLabel.Text = $"Score: {currentMatch.Runs}/{currentMatch.Wickets}";
         OverLabel.Text = $"Overs: {currentMatch.OversDetails.Count}/{currentMatch.TotalOvers}";
+        BattingTeamLabel.Text = isFirstInnings ? currentMatch.TeamA : currentMatch.TeamB;
 
         var overs = currentMatch.OversDetails.ToList();
+        var batters = isFirstInnings ? currentMatch.TeamABatters : currentMatch.TeamBBatters;
 
+        // NEW: Update batting pair label
+        if (batters.Count >= (currentMatch.CurrentPairIndex * 2 + 2))
+        {
+            string batter1 = batters[currentMatch.CurrentPairIndex * 2];
+            string batter2 = batters[currentMatch.CurrentPairIndex * 2 + 1];
+            BattingPairLabel.Text = $"{batter1} & {batter2}";
+        }
+        else
+        {
+            BattingPairLabel.Text = "No Active Batters";
+        }
 
         if (!isFirstInnings)
         {
@@ -178,6 +202,19 @@ public partial class ScoringPage : ContentPage
 
         ballsInCurrentOver = 0;
         UpdateScoreDisplay();
+
+        // NEW: Check if time to swap batting pair
+        int oversBowled = currentMatch.OversDetails.Count;
+        if (oversBowled % currentMatch.OversPerPair == 0)
+        {
+            bool swap = await DisplayAlert("Swap Batting Pair", "Swap to next batting pair now?", "Yes", "No");
+            if (swap)
+            {
+                currentMatch.CurrentPairIndex++;
+                UpdateScoreDisplay(); // Refresh new batters
+            }
+        }
+
         if (currentMatch.OversDetails.Count >= currentMatch.TotalOvers)
         {
             bool endNow = await DisplayAlert("Overs Complete", "The maximum number of overs is reached. End the innings now?", "Yes", "No");

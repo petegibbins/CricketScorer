@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using CricketScorer.Helpers;
+using CricketScorer.Models;
 
 namespace CricketScorer.Views
 {
@@ -12,7 +13,8 @@ namespace CricketScorer.Views
 
         private async void OnNewMatchClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new NewMatchPage());
+            Match match = new Match();
+            await Navigation.PushAsync(new NewMatchPage(match));
         }
 
         private async void Button_Pressed(object sender, EventArgs e)
@@ -29,6 +31,12 @@ namespace CricketScorer.Views
             {
                 await ButtonAnimations.ExpandOnRelease(element);
             }
+        }
+
+        private async void OnPlayerSetUpClicked(object sender, EventArgs e)
+        {
+            var match = new Match();
+            await Navigation.PushAsync(new TeamSetupPage(match, true)); // Start with Team A
         }
     }
 }

@@ -5,17 +5,34 @@ namespace CricketScorer.Views;
 
 public partial class NewMatchPage : ContentPage
 {
+    private Match currentMatch;
 
-    public NewMatchPage()
+    public NewMatchPage(Match match)
     {
         InitializeComponent();
+        currentMatch = match;
+        // Use currentMatch in the page as needed
+        TeamAEntry.Text = currentMatch.TeamA;
+        TeamBEntry.Text = currentMatch.TeamB;
     }
 
     private async void OnStartScoringClicked(object sender, EventArgs e)
     {
         string teamA = TeamAEntry.Text;
         string teamB = TeamBEntry.Text;
-        int overs = int.TryParse(OversEntry.Text, out var o) ? o : 0;
+        int startingRuns = int.TryParse(RunsEntry.Text, out var r) ? r : 0;
+        int oversInMatch = int.TryParse(OversEntry.Text, out var o) ? o : 0;
+
+        if (oversInMatch <= 0)
+        {
+            await DisplayAlert("Error", "Please enter a valid number of overs.", "OK");
+            return;
+        }
+        else
+        {
+            currentMatch.TotalOvers = oversInMatch;
+            currentMatch.Runs = startingRuns;
+        }
 
         if (string.IsNullOrWhiteSpace(teamA) || string.IsNullOrWhiteSpace(teamB) || overs <= 0)
         {
@@ -23,18 +40,7 @@ public partial class NewMatchPage : ContentPage
             return;
         }
 
-        var match = new Match
-        {
-            TeamA = teamA,
-            TeamB = teamB,
-            TotalOvers = overs,
-            Runs = 200,        // Start at 200 runs
-            Wickets = 0,
-            Players = new List<Player>(),
-            OversDetails = new List<Over>()
-        };
-
-        await Navigation.PushAsync(new ScoringPage(match));
+        await Navigation.PushAsync(new ScoringPage(currentMatch));
     }
 
     private async void OnButtonPressed(object sender, EventArgs e)
