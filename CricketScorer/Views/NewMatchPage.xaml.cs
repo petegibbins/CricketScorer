@@ -34,7 +34,7 @@ public partial class NewMatchPage : ContentPage
             currentMatch.Runs = startingRuns;
         }
 
-        if (string.IsNullOrWhiteSpace(teamA) || string.IsNullOrWhiteSpace(teamB) || overs <= 0)
+        if (string.IsNullOrWhiteSpace(teamA) || string.IsNullOrWhiteSpace(teamB) || oversInMatch <= 0)
         {
             await DisplayAlert("Error", "Please fill in all fields correctly.", "OK");
             return;
