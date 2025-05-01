@@ -38,5 +38,26 @@ namespace CricketScorer.Views
             var match = new Match();
             await Navigation.PushAsync(new TeamSetupPage(match, true)); // Start with Team A
         }
+
+        private async void OnStartDemoMatchClicked(object sender, EventArgs e)
+        {
+            var match = new Match
+            {
+                TeamA = "Twistas",
+                TeamABatters = new List<string>
+            {
+                "Kat", "Kitch", "Bianka", "Sarahrah", "Gemma", "Em", "Teja", "Di"
+            },
+                    TeamB = "Bury",
+                    TeamBBatters = new List<string>
+            {
+                "Lisa", "Antonia", "Marta", "Sue", "Sally", "Ann", "Flo", "Mavis"
+            },
+                    TotalOvers = 8,
+                    OversPerPair = 2
+            };
+
+            await Navigation.PushAsync(new ScoringPage(match));
+        }
     }
 }

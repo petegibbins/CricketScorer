@@ -11,6 +11,11 @@
         BackgroundColor="DarkGreen"
         TextColor="White"
         Clicked="OnPlayerSetUpClicked" />
+        <Button Text="Start Demo Match"
+        BackgroundColor="DodgerBlue"
+        TextColor="White"
+        Clicked="OnStartDemoMatchClicked" />
+
 
     </VerticalStackLayout>
 

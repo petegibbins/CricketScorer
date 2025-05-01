@@ -15,12 +15,18 @@ public partial class ScoringPage : ContentPage
     private int teamAOvers = 0;
     private bool matchEnded = false;
     private string currentBowler;
+    private bool showBowlerPopup = false;
+    private List<string> availableBowlers = new();
 
     public ScoringPage(Match match)
     {
         InitializeComponent();
         currentMatch = match;
         UpdateScoreDisplay();
+        NavigationPage.SetHasNavigationBar(this, false);
+        NavigationPage.SetHasBackButton(this, false);
+        showBowlerPopup = true;
+        BowlerPopup.IsVisible = true;
     }
 
     protected override async void OnAppearing()
@@ -244,14 +250,33 @@ public partial class ScoringPage : ContentPage
             return;
         }
 
-        string selectedBowler = await DisplayActionSheet("Select Bowler for New Over", "Cancel", null, bowlers.ToArray());
+        BowlerList.ItemsSource = null;
+        BowlerList.ItemsSource = bowlers;
+        showBowlerPopup = true;
+        BowlerPopup.IsVisible = true;
+    }
 
-        if (selectedBowler != null && selectedBowler != "Cancel")
+    private void OnBowlerSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is string selectedBowler)
         {
             currentBowler = selectedBowler;
+            currentMatch.OverBowlers.Add(currentBowler);
             UpdateBowlerDisplay();
+            BowlerPopup.IsVisible = false;
+            showBowlerPopup = false;
+            BowlerPopup.IsVisible = true;  // show
+            
         }
     }
+
+    private void OnCancelBowlerPopup(object sender, EventArgs e)
+    {
+        BowlerPopup.IsVisible = false;
+        showBowlerPopup = false;
+        BowlerPopup.IsVisible = false; // hide
+    }
+
     private void UpdateBowlerDisplay()
     {
         CurrentBowlerLabel.Text = $"Bowler: {currentBowler}";
