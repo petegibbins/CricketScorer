@@ -14,9 +14,10 @@ public partial class ScoringPage : ContentPage
     private int teamAWickets = 0;
     private int teamAOvers = 0;
     private bool matchEnded = false;
-    private string currentBowler;
+    private string currentBowler = "Unknown";
     private bool showBowlerPopup = false;
     private List<string> availableBowlers = new();
+
 
     public ScoringPage(Match match)
     {
@@ -53,7 +54,7 @@ public partial class ScoringPage : ContentPage
         BattingTeamLabel.Text = isFirstInnings ? currentMatch.TeamA : currentMatch.TeamB;
 
         var overs = currentMatch.OversDetails.ToList();
-        var batters = isFirstInnings ? currentMatch.TeamABatters : currentMatch.TeamBBatters;
+        var batters = isFirstInnings ? currentMatch.TeamAPlayers : currentMatch.TeamBPlayers;
 
         // NEW: Update batting pair label
         if (batters.Count >= (currentMatch.CurrentPairIndex * 2 + 2))
@@ -87,7 +88,7 @@ public partial class ScoringPage : ContentPage
         }
 
         // Add the current over (even if incomplete) to the list temporarily
-        if (currentOver.Balls.Count > 0)
+        if (currentOver.Deliveries.Count > 0)
         {
             overs.Add(currentOver);
         }
@@ -118,7 +119,7 @@ public partial class ScoringPage : ContentPage
     {
         var formatted = new FormattedString();
 
-        if (over == null || over.Balls.Count == 0)
+        if (over == null || over.Deliveries.Count == 0)
         {
             formatted.Spans.Add(new Span { Text = "-" });
             return formatted;
@@ -131,7 +132,7 @@ public partial class ScoringPage : ContentPage
             TextColor = Colors.DarkBlue
         });
 
-        foreach (var ball in over.Balls)
+        foreach (var ball in over.Deliveries)
         {
             string ballText = ball.ToString() + " ";
 
@@ -153,7 +154,7 @@ public partial class ScoringPage : ContentPage
 
         ballsInCurrentOver++;
 
-        currentOver.Balls.Add(new Ball { Runs = runs, IsWide = isWide, IsNoBall = isNoBall });
+        currentOver.Deliveries.Add(new Ball { Runs = runs, IsWide = isWide, IsNoBall = isNoBall });
         CheckForMatchWin();
         CheckOverComplete();
         UpdateScoreDisplay();
@@ -183,7 +184,7 @@ public partial class ScoringPage : ContentPage
             currentMatch.Runs = 0; // Prevent negative total score if needed
 
         ballsInCurrentOver++;
-        currentOver.Balls.Add(new Ball { Runs = 0, IsWicket = true });
+        currentOver.Deliveries.Add(new Ball { Runs = 0, IsWicket = true });
 
         await DisplayAlert("Wicket!", "-5 runs penalty applied.", "OK");
         CheckForMatchWin();
@@ -207,7 +208,7 @@ public partial class ScoringPage : ContentPage
 
     private async void EndOver()
     {
-        if (currentOver.Balls.Count > 0)
+        if (currentOver.Deliveries.Count > 0)
         {
             currentMatch.OversDetails.Add(currentOver);
             currentMatch.OverBowlers.Add(currentBowler);
@@ -242,7 +243,7 @@ public partial class ScoringPage : ContentPage
 
     private async Task SelectNextBowler()
     {
-        var bowlers = isFirstInnings ? currentMatch.TeamBBatters : currentMatch.TeamABatters; // Bowling team is the fielding side
+        var bowlers = isFirstInnings ? currentMatch.TeamBPlayers : currentMatch.TeamAPlayers; // Bowling team is the fielding side
 
         if (bowlers.Count == 0)
         {
@@ -252,8 +253,19 @@ public partial class ScoringPage : ContentPage
 
         BowlerList.ItemsSource = null;
         BowlerList.ItemsSource = bowlers;
-        showBowlerPopup = true;
+
+        BowlerPopup.Opacity = 0;
         BowlerPopup.IsVisible = true;
+        
+        DimBackground.IsVisible = true;
+        BowlerPopup.Opacity = 0;
+        BowlerPopup.IsVisible = true;
+        
+        await BowlerPopup.FadeTo(1, 250, Easing.CubicOut);
+        await BowlerPopup.ScaleTo(1.1, 150);
+        await BowlerPopup.ScaleTo(1.0, 100);
+        ScrollHintLabel.IsVisible = bowlers.Count > 5;
+        ScrollFadeOverlay.IsVisible = bowlers.Count > 5;
     }
 
     private void OnBowlerSelected(object sender, SelectionChangedEventArgs e)
@@ -266,20 +278,43 @@ public partial class ScoringPage : ContentPage
             BowlerPopup.IsVisible = false;
             showBowlerPopup = false;
             BowlerPopup.IsVisible = true;  // show
-            
+            DimBackground.IsVisible = false;
         }
+    }
+
+    private void OnBowlerTapped(object sender, EventArgs e)
+    {
+        if (sender is Frame frame && frame.Content is Label label && label.Text is string selectedBowler)
+        {
+            currentBowler = selectedBowler;
+            currentMatch.OverBowlers.Add(currentBowler);
+            UpdateBowlerDisplay();
+
+            BowlerPopup.IsVisible = false;
+            DimBackground.IsVisible = false;
+        }
+    }
+    private async void OnBowlerNameTapped(object sender, EventArgs e)
+    {
+        bool confirm = await DisplayAlert("Change Bowler", "Do you want to change the current bowler?", "Yes", "Cancel");
+
+        if (!confirm) return;
+
+        // Show the same popup you use after End Over
+        await SelectNextBowler();
     }
 
     private void OnCancelBowlerPopup(object sender, EventArgs e)
     {
         BowlerPopup.IsVisible = false;
+        DimBackground.IsVisible = false;
         showBowlerPopup = false;
         BowlerPopup.IsVisible = false; // hide
     }
 
     private void UpdateBowlerDisplay()
     {
-        CurrentBowlerLabel.Text = $"Bowler: {currentBowler}";
+        CurrentBowlerLabel.Text = $"{currentBowler}";
     }
 
     private void OnWideClicked(object sender, EventArgs e)
@@ -301,9 +336,9 @@ public partial class ScoringPage : ContentPage
     private async void OnUndoClicked(object sender, EventArgs e)
     {
         // Step 1: Check if there are any balls to undo
-        if (currentOver.Balls.Count > 0)
+        if (currentOver.Deliveries.Count > 0)
         {
-            var lastBall = currentOver.Balls.Last();
+            var lastBall = currentOver.Deliveries.Last();
 
             // Step 2: Adjust match score based on last ball
             if (lastBall.IsWide || lastBall.IsNoBall)
@@ -321,7 +356,7 @@ public partial class ScoringPage : ContentPage
             }
 
             // Step 3: Remove the ball
-            currentOver.Balls.Remove(lastBall);
+            currentOver.Deliveries.Remove(lastBall);
 
             ballsInCurrentOver--;
             if (ballsInCurrentOver < 0) ballsInCurrentOver = 0; // Safety
@@ -334,9 +369,9 @@ public partial class ScoringPage : ContentPage
             currentOver = currentMatch.OversDetails.Last();
             currentMatch.OversDetails.Remove(currentOver);
 
-            if (currentOver.Balls.Count > 0)
+            if (currentOver.Deliveries.Count > 0)
             {
-                var lastBall = currentOver.Balls.Last();
+                var lastBall = currentOver.Deliveries.Last();
 
                 if (lastBall.IsWide || lastBall.IsNoBall)
                 {
@@ -352,8 +387,8 @@ public partial class ScoringPage : ContentPage
                     currentMatch.Runs -= lastBall.Runs;
                 }
 
-                currentOver.Balls.Remove(lastBall);
-                ballsInCurrentOver = currentOver.Balls.Count;
+                currentOver.Deliveries.Remove(lastBall);
+                ballsInCurrentOver = currentOver.Deliveries.Count;
             }
 
             UpdateScoreDisplay();
@@ -370,7 +405,7 @@ public partial class ScoringPage : ContentPage
 
         if (confirm)
         {
-            if (currentOver.Balls.Count > 0)
+            if (currentOver.Deliveries.Count > 0)
             {
                 currentMatch.OversDetails.Add(currentOver);
                 currentOver = new Over();
@@ -443,7 +478,7 @@ public partial class ScoringPage : ContentPage
 
     private async Task EndInningsManually()
     {
-        if (currentOver.Balls.Count > 0)
+        if (currentOver.Deliveries.Count > 0)
         {
             currentMatch.OversDetails.Add(currentOver);
             currentOver = new Over();
@@ -469,6 +504,8 @@ public partial class ScoringPage : ContentPage
         else
         {
             // Both innings complete
+            MatchResult result = MatchConverter.BuildMatchResult(currentMatch);
+            await MatchSaver.SaveMatchResultAsync(result);
             await Navigation.PushAsync(new SummaryPage(currentMatch, teamATotalRuns, teamAWickets, teamAOvers));
         }
     }

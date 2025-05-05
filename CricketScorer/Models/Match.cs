@@ -6,29 +6,34 @@ using System.Threading.Tasks;
 
 namespace CricketScorer.Models
 {
-
     public class Match
     {
         public string TeamA { get; set; }
-        public List<string> TeamABatters { get; set; } = new();
+        public List<string> TeamAPlayers { get; set; } = new();
 
         public string TeamB { get; set; }
-        public List<string> TeamBBatters { get; set; } = new();
-        public List<Player> Players { get; set; } = [];
+        public List<string> TeamBPlayers { get; set; } = new();
         public int TotalOvers { get; set; }
         public int Runs { get; set; }
         public int Wickets { get; set; }
         public List<Over> OversDetails { get; set; } = [];
         public int CurrentPairIndex { get; set; } = 0; // 0 = first pair
         public int OversPerPair { get; set; } = 2;      // Change pair every 2 overs
-        public List<string> TeamABowlers { get; set; } = new();
-        public List<string> TeamBBowlers { get; set; } = new();
+
+        public DateTime MatchDate { get; set; } = DateTime.Now;
+        public bool IsMatchComplete { get; set; }
+
+        public int TeamAScore { get; set; }
+        public int TeamBScore { get; set; }
+
+        public bool IsFirstInningsComplete { get; set; }
+        public bool IsFirstInnings { get; set; }
 
         // Track who bowled each over
         public List<string> OverBowlers { get; set; } = new();
         public List<string> GetCurrentBatters(bool isFirstInnings)
         {
-            return isFirstInnings ? TeamABatters : TeamBBatters;
+            return isFirstInnings ? TeamAPlayers : TeamBPlayers;
         }
 
     }

@@ -4,55 +4,99 @@
              x:Class="CricketScorer.Views.ScoringPage"
              Title="ScoringPage">
 
+    <Grid>
+        <VerticalStackLayout Padding="20" Spacing="5" x:Name="MainScoringLayout">
+            <Frame CornerRadius="20" Padding="15" BackgroundColor="#f0f0f0" HasShadow="True" Margin="0,10,0,10">
+                <VerticalStackLayout Spacing="20">
+                    <Label x:Name="TargetLabel"  Grid.Column="0" FontSize="20" TextColor="DarkGreen" HorizontalOptions="Center" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Padding="0,20,0,10" RowSpacing="10">
 
-    <VerticalStackLayout Padding="20" Spacing="5">
-        <!-- Batting bowling info -->
-        <Label x:Name="BattingTeamLabel" FontSize="22" HorizontalOptions="Center" />
-        <Label Text="Current Batters:" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" />
-        <Label x:Name="BattingPairLabel" FontSize="22" HorizontalOptions="Center" />
-        <Label Text="Current Bowler:" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" />
-        <Label x:Name="CurrentBowlerLabel" FontSize="22" HorizontalOptions="Center" />
-        <!-- Score Display -->
-        <Label x:Name="ScoreLabel" Text="Score: 0/0" FontSize="36" HorizontalOptions="Center" />
-        <Label x:Name="OverLabel" Text="Overs: 0" FontSize="24" HorizontalOptions="Center" />
-        <Label x:Name="TargetLabel" FontSize="20" TextColor="DarkGreen" HorizontalOptions="Center" />
-        <Frame CornerRadius="20" Padding="15" BackgroundColor="#f0f0f0" HasShadow="True" Margin="0,10,0,10">
-            <VerticalStackLayout Spacing="20">
-                <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" ColumnSpacing="10" RowSpacing="10">
-                    <Grid.Children>
-                        <Button Text="Dot" Style="{StaticResource DefaultButtonStyle}" Clicked="OnDotClicked" Grid.Column="0" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                        <Button Text="+1 Run" Style="{StaticResource DefaultButtonStyle}" Clicked="OnOneRunClicked" Grid.Column="1" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                        <Button Text="+2 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnTwoRunsClicked" Grid.Column="2" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                        <Button Text="+4 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnFourRunsClicked" Grid.Column="3" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                    </Grid.Children>
-                </Grid>
+                        <!-- Score -->
+                        <Label x:Name="ScoreLabel" Grid.Column="0" FontSize="28" />
 
-                <!-- second row -->
-                <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" ColumnSpacing="10" RowSpacing="10">
-                    <Grid.Children>
-                        <Button Text="+6 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnSixRunsClicked" Grid.Column="0" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                        <Button Text="Wide" Style="{StaticResource DefaultButtonStyle}" Clicked="OnWideClicked" Grid.Column="1" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                        <Button Text="NB" Style="{StaticResource DefaultButtonStyle}" Clicked="OnNoBallClicked" Grid.Column="2" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                        <Button Text="Custom" Style="{StaticResource DefaultButtonStyle}" Clicked="OnCustomRunClicked" Grid.Column="3" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                    </Grid.Children>
-                </Grid>
+                        <!-- Overs -->
+                        <Label x:Name="OverLabel" Grid.Column="1" FontSize="28" />
 
-                <!-- Match Actions -->
-                <Grid ColumnDefinitions="*,1.2*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
-                    <Grid.Children>
-                        <Button Text="Wicket" BackgroundColor="Red" TextColor="White" Grid.Column="0" Clicked="OnWicketClicked" Style="{StaticResource WicketButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                        <Button Text="End Over" BackgroundColor="DarkGray" TextColor="White" Grid.Column="1" Clicked="OnEndOverClicked" Style="{StaticResource EndOverButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                        <Button Style="{StaticResource UndoButtonStyle}" Clicked="OnUndoClicked" Grid.Column="2" ContentLayout="Top,0" Pressed="OnButtonPressed" Released="OnButtonReleased">
-                            <Button.ImageSource>
-                                <FileImageSource File="undo.png" />
-                            </Button.ImageSource>
-                        </Button>
-                    </Grid.Children>
-                </Grid>
+                        <!-- Team -->
+                        <Label Text="Team" Grid.Column="0" Grid.Row="2" FontSize="16" FontAttributes="Bold" />
+                        <Label x:Name="BattingTeamLabel" Grid.Column="0" Grid.Row="3" FontSize="20" />
 
-                <!-- End Innings Button -->
-                <Button Text="End Innings" BackgroundColor="Green" TextColor="White" Clicked="OnEndInningsClicked" Style="{StaticResource EndInningsButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
-                <Frame x:Name="BowlerPopup"
+                        <!-- Bowler -->
+                        <Label Text="Bowler" Grid.Column="1" Grid.Row="2" FontSize="16" FontAttributes="Bold" />
+                        <Label x:Name="CurrentBowlerLabel" Grid.Column="1" Grid.Row="3" FontSize="20" TextColor="Blue" FontAttributes="Italic" TextDecorations="Underline"  >
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnBowlerNameTapped" />
+                            </Label.GestureRecognizers>
+                        </Label>
+
+                        <!-- Batting Pair -->
+                        <Label Text="Batters" Grid.ColumnSpan="2" Grid.Row="4" FontSize="16" FontAttributes="Bold" HorizontalOptions="Start" />
+                        <Label x:Name="BattingPairLabel" Grid.ColumnSpan="2" Grid.Row="5" FontSize="22" HorizontalOptions="Start" />
+
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame CornerRadius="20" Padding="15" BackgroundColor="#f0f0f0" HasShadow="True" Margin="0,10,0,10">
+                <VerticalStackLayout Spacing="20">
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" ColumnSpacing="10" RowSpacing="10">
+                        <Grid.Children>
+                            <Button Text="Dot" Style="{StaticResource DefaultButtonStyle}" Clicked="OnDotClicked" Grid.Column="0" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                            <Button Text="+1 Run" Style="{StaticResource DefaultButtonStyle}" Clicked="OnOneRunClicked" Grid.Column="1" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                            <Button Text="+2 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnTwoRunsClicked" Grid.Column="2" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                            <Button Text="+4 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnFourRunsClicked" Grid.Column="3" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        </Grid.Children>
+                    </Grid>
+
+                    <!-- second row -->
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" ColumnSpacing="10" RowSpacing="10">
+                        <Grid.Children>
+                            <Button Text="+6 Runs" Style="{StaticResource DefaultButtonStyle}" Clicked="OnSixRunsClicked" Grid.Column="0" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                            <Button Text="Wide" Style="{StaticResource DefaultButtonStyle}" Clicked="OnWideClicked" Grid.Column="1" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                            <Button Text="NB" Style="{StaticResource DefaultButtonStyle}" Clicked="OnNoBallClicked" Grid.Column="2" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                            <Button Text="Custom" Style="{StaticResource DefaultButtonStyle}" Clicked="OnCustomRunClicked" Grid.Column="3" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                        </Grid.Children>
+                    </Grid>
+
+                    <!-- Match Actions -->
+                    <Grid ColumnDefinitions="*,1.2*,*" RowDefinitions="Auto" Padding="0" ColumnSpacing="10" RowSpacing="10">
+                        <Grid.Children>
+                            <Button Text="Wicket" BackgroundColor="Red" TextColor="White" Grid.Column="0" Clicked="OnWicketClicked" Style="{StaticResource WicketButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                            <Button Text="End Over" BackgroundColor="DarkGray" TextColor="White" Grid.Column="1" Clicked="OnEndOverClicked" Style="{StaticResource EndOverButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+                            <Button Style="{StaticResource UndoButtonStyle}" Clicked="OnUndoClicked" Grid.Column="2" ContentLayout="Top,0" Pressed="OnButtonPressed" Released="OnButtonReleased">
+                                <Button.ImageSource>
+                                    <FileImageSource File="undo.png" />
+                                </Button.ImageSource>
+                            </Button>
+                        </Grid.Children>
+                    </Grid>
+
+                    <!-- End Innings Button -->
+                    <Button Text="End Innings" BackgroundColor="Green" TextColor="White" Clicked="OnEndInningsClicked" Style="{StaticResource EndInningsButtonStyle}" Pressed="OnButtonPressed" Released="OnButtonReleased"/>
+
+                </VerticalStackLayout>
+            </Frame>
+            <!-- Last Two Overs -->
+            <Frame CornerRadius="20" Padding="15" BackgroundColor="#e6f2ff" HasShadow="True" Margin="0,20,0,0">
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Last 2 Overs" FontAttributes="Bold" FontSize="20" HorizontalOptions="Center" TextColor="DarkBlue" />
+
+                    <Label x:Name="LastOver1Label" HorizontalOptions="Center" />
+                    <Label x:Name="LastOver2Label" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+            </Frame>
+        </VerticalStackLayout>
+        <!-- NEW: Dimming overlay -->
+        <BoxView x:Name="DimBackground"
+             IsVisible="False"
+             BackgroundColor="Black"
+             Opacity="0.4"
+             InputTransparent="True"
+             Grid.RowSpan="1"
+             />
+        <Frame x:Name="BowlerPopup"
                        IsVisible="False"
                        BackgroundColor="White"
                        BorderColor="DarkGreen"
@@ -64,46 +108,63 @@
                        HasShadow="True"
                        ZIndex="9999">
 
-                    <VerticalStackLayout Spacing="15">
-                        <Label Text="Select Bowler"
+            <VerticalStackLayout Spacing="15">
+                <Label Text="Select Bowler"
                            FontSize="22"
                            FontAttributes="Bold"
                            HorizontalOptions="Center"
                            TextColor="DarkGreen"/>
 
-                        <CollectionView x:Name="BowlerList" HeightRequest="250"
-                                SelectionMode="Single" 
-                                SelectionChanged="OnBowlerSelected">
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Frame Padding="10" Margin="5" CornerRadius="12" BackgroundColor="LightGray">
-                                            <Label Text="{Binding}" FontSize="18" HorizontalOptions="Center"/>
-                                        </Frame>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
+                <Grid HeightRequest="250">
 
-                        <Button Text="Cancel"
+                    <!-- Scrollable bowler list -->
+                    <CollectionView x:Name="BowlerList"
+                    SelectionMode="None"
+                    SelectionChanged="OnBowlerSelected" >
+
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                <Frame Padding="10"
+                                       Margin="5"
+                                       CornerRadius="12"
+                                       BackgroundColor="LightGray"
+                                       HasShadow="True">
+                                    <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnBowlerTapped" />
+                                </Frame.GestureRecognizers>
+
+                                        <Label Text="{Binding}"
+                           FontSize="20"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           TextColor="Black" />
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                    <!-- Fake "fade" overlay -->
+                    <BoxView x:Name="ScrollFadeOverlay" HeightRequest="30"
+                         VerticalOptions="End"
+                         BackgroundColor="White"
+                         Opacity="0.6"/>
+
+                    <!-- Optional downward arrow -->
+                    <Label x:Name="ScrollHintLabel" Text="↓"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="Gray"
+                       VerticalOptions="End"
+                       HorizontalOptions="Center"
+                       Margin="0,0,0,5" />
+                </Grid>
+
+                <Button Text="Cancel"
                             BackgroundColor="LightGray"
                             Clicked="OnCancelBowlerPopup"/>
-                    </VerticalStackLayout>
-                </Frame>
-
             </VerticalStackLayout>
         </Frame>
-        <!-- Last Two Overs -->
-        <Frame CornerRadius="20" Padding="15" BackgroundColor="#e6f2ff" HasShadow="True" Margin="0,20,0,0">
-
-            <VerticalStackLayout Spacing="10">
-                <Label Text="Last 2 Overs" FontAttributes="Bold" FontSize="20" HorizontalOptions="Center" TextColor="DarkBlue" />
-
-                <Label x:Name="LastOver1Label" HorizontalOptions="Center" />
-                <Label x:Name="LastOver2Label" HorizontalOptions="Center" />
-            </VerticalStackLayout>
-
-        </Frame>
-
-
-    </VerticalStackLayout>
+    </Grid>
 
 </ContentPage>

@@ -12,6 +12,8 @@ namespace CricketScorer.Models
         public bool IsWicket { get; set; }
         public bool IsWide { get; set; }
         public bool IsNoBall { get; set; }
+        public  string Batter1 { get; set; }
+        public  string Batter2 { get; set; }
 
         public override string ToString()
         {

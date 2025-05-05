@@ -13,7 +13,7 @@ public partial class PlayerSetupPage : ContentPage
 
     private void OnAddPlayerClicked(object sender, EventArgs e)
     {
-        string name = PlayerNameEntry.Text?.Trim();
+        string? name = PlayerNameEntry.Text?.Trim();
         if (!string.IsNullOrWhiteSpace(name))
         {
             batters.Add(name);

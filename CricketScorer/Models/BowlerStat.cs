@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace CricketScorer.Models
 {
-    public class Over
+    public class BowlerStat
     {
         public string Bowler { get; set; }
-        public List<Ball> Deliveries { get; set; } = new();
+        public int RunsConceded { get; set; }
+        public int Wickets { get; set; }
     }
 }

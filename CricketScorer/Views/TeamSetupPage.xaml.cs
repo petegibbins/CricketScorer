@@ -20,7 +20,7 @@ namespace CricketScorer.Views
 
         private void OnAddPlayerClicked(object sender, EventArgs e)
         {
-            string name = PlayerNameEntry.Text?.Trim();
+            string? name = PlayerNameEntry.Text?.Trim();
             if (!string.IsNullOrWhiteSpace(name))
             {
                 players.Add(name);
@@ -31,7 +31,7 @@ namespace CricketScorer.Views
 
         private async void OnNextClicked(object sender, EventArgs e)
         {
-            string teamName = TeamNameEntry.Text?.Trim();
+            string? teamName = TeamNameEntry.Text?.Trim();
 
             if (string.IsNullOrWhiteSpace(teamName) || players.Count < 2)
             {
@@ -42,13 +42,13 @@ namespace CricketScorer.Views
             if (isTeamA)
             {
                 match.TeamA = teamName;
-                match.TeamABatters = players.ToList();
+                match.TeamAPlayers = players.ToList();
                 await Navigation.PushAsync(new TeamSetupPage(match, false)); // Move to Team B
             }
             else
             {
                 match.TeamB = teamName;
-                match.TeamBBatters = players.ToList();
+                match.TeamBPlayers = players.ToList();
                 await Navigation.PushAsync(new NewMatchPage(match)); // Ready for match settings
             }
         }
