@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CricketScorer.Helpers;
 using CricketScorer.Models;
 
@@ -10,11 +11,8 @@ public partial class ScoringPage : ContentPage
     private int ballsInCurrentOver = 0;
     private Over currentOver = new Over();
     private bool isFirstInnings = true;
-    private int teamATotalRuns = 0;
-    private int teamAWickets = 0;
-    private int teamAOvers = 0;
     private bool matchEnded = false;
-    private string currentBowler = "Unknown";
+    private string currentBowler = string.Empty;
     private bool showBowlerPopup = false;
     private List<string> availableBowlers = new();
 
@@ -70,7 +68,7 @@ public partial class ScoringPage : ContentPage
 
         if (!isFirstInnings)
         {
-            int target = teamATotalRuns + 1; // Must beat Team A's total
+            int target = currentMatch.TeamAScore + 1; // Must beat Team A's total
             int runsNeeded = target - currentMatch.Runs;
 
             if (runsNeeded > 0)
@@ -151,10 +149,20 @@ public partial class ScoringPage : ContentPage
     {
         if (matchEnded) return; // Prevent scoring if match already won
         currentMatch.Runs += runs;
-
+        if (isFirstInnings)
+        {
+            currentMatch.TeamAScore = currentMatch.Runs;
+        }
+        else
+        {
+            currentMatch.TeamBScore = currentMatch.Runs;
+        }
         ballsInCurrentOver++;
 
-        currentOver.Deliveries.Add(new Ball { Runs = runs, IsWide = isWide, IsNoBall = isNoBall });
+        currentOver.Deliveries.Add(new Ball { Runs = runs, IsWide = isWide, IsNoBall = isNoBall, Batters = BattingPairLabel.Text });
+
+
+
         CheckForMatchWin();
         CheckOverComplete();
         UpdateScoreDisplay();
@@ -243,30 +251,45 @@ public partial class ScoringPage : ContentPage
 
     private async Task SelectNextBowler()
     {
-        var bowlers = isFirstInnings ? currentMatch.TeamBPlayers : currentMatch.TeamAPlayers; // Bowling team is the fielding side
-
-        if (bowlers.Count == 0)
+        try
         {
-            await DisplayAlert("No Bowlers", "No bowlers available!", "OK");
-            return;
+            List<string> bowlers = isFirstInnings ? currentMatch.TeamBPlayers : currentMatch.TeamAPlayers; // Bowling team is the fielding side
+            if (bowlers.Count == 0)
+            {
+                await DisplayAlert("No Bowlers", "No bowlers available!", "OK");
+                return;
+            }
+
+            BowlerList.ItemsSource = null;
+            BowlerList.ItemsSource = bowlers;
+
+            BowlerPopup.Opacity = 0;
+            BowlerPopup.IsVisible = true;
+
+            DimBackground.IsVisible = true;
+            BowlerPopup.Opacity = 0;
+            BowlerPopup.IsVisible = true;
+
+            await BowlerPopup.FadeTo(1, 250, Easing.CubicOut);
+            await BowlerPopup.ScaleTo(1.1, 150);
+            await BowlerPopup.ScaleTo(1.0, 100);
+            ScrollHintLabel.IsVisible = bowlers.Count > 5;
+            ScrollFadeOverlay.IsVisible = bowlers.Count > 5;
+
+            // Set the batters for this over
+            var batters = isFirstInnings ? currentMatch.TeamAPlayers : currentMatch.TeamBPlayers;
+            currentOver.Batter1 = batters[currentMatch.CurrentPairIndex * 2];
+            currentOver.Batter2 = batters[currentMatch.CurrentPairIndex * 2 + 1];
+            currentOver.Bowler = currentBowler;
+
         }
-
-        BowlerList.ItemsSource = null;
-        BowlerList.ItemsSource = bowlers;
-
-        BowlerPopup.Opacity = 0;
-        BowlerPopup.IsVisible = true;
-        
-        DimBackground.IsVisible = true;
-        BowlerPopup.Opacity = 0;
-        BowlerPopup.IsVisible = true;
-        
-        await BowlerPopup.FadeTo(1, 250, Easing.CubicOut);
-        await BowlerPopup.ScaleTo(1.1, 150);
-        await BowlerPopup.ScaleTo(1.0, 100);
-        ScrollHintLabel.IsVisible = bowlers.Count > 5;
-        ScrollFadeOverlay.IsVisible = bowlers.Count > 5;
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[EXCEPTION] {ex}");
+        }
     }
+
+
 
     private void OnBowlerSelected(object sender, SelectionChangedEventArgs e)
     {
@@ -405,56 +428,66 @@ public partial class ScoringPage : ContentPage
 
         if (confirm)
         {
-            if (currentOver.Deliveries.Count > 0)
-            {
-                currentMatch.OversDetails.Add(currentOver);
-                currentOver = new Over();
-            }
-
-            if (isFirstInnings)
-            {
-                // Team A has finished batting
-                isFirstInnings = false;
-
-                // Save Team A's final score (store it separately)
-                teamATotalRuns = currentMatch.Runs;
-                teamAWickets = currentMatch.Wickets;
-                teamAOvers = currentMatch.OversDetails.Count;
-
-                // Reset match for Team B innings
-                currentMatch.Runs = 200; // New starting runs
-                currentMatch.Wickets = 0;
-                currentMatch.OversDetails.Clear();
-                ballsInCurrentOver = 0;
-                currentOver = new Over();
-
-                await DisplayAlert("New Innings", $"{currentMatch.TeamB} now batting to chase {teamATotalRuns} runs!", "OK");
-
-                UpdateScoreDisplay();
-            }
-            else
-            {
-                // Both innings complete — now finish match
-                await Navigation.PushAsync(new SummaryPage(currentMatch, teamATotalRuns, teamAWickets, teamAOvers));
-            }
+            await EndInningsManually();
         }
     }
+
+    private async Task EndInningsManually()
+    {
+        if (currentOver.Deliveries.Count > 0)
+        {
+            currentMatch.OversDetails.Add(currentOver);
+            currentOver = new Over();
+        }
+
+        if (isFirstInnings)
+        {
+            isFirstInnings = false;
+            currentMatch.IsFirstInningsComplete = true;
+            currentMatch.TeamAScore = currentMatch.Runs;
+            currentMatch.TeamAWickets = currentMatch.Wickets;
+            currentMatch.TeamAOvers = currentMatch.OversDetails.Count;
+
+            currentMatch.Runs = 200; // Reset for Team B innings
+            currentMatch.Wickets = 0;
+            currentMatch.OversDetails.Clear();
+            
+            ballsInCurrentOver = 0;
+            // End of the first innings, new over in the 2nd innings
+            currentOver = new Over();
+
+            // Reset the pointer to the batting pair, back to the first pair.
+            currentMatch.CurrentPairIndex = 0;
+
+            await DisplayAlert("New Innings", $"{currentMatch.TeamB} now batting to chase {currentMatch.TeamAScore} runs!", "OK");
+            await SelectNextBowler();
+            UpdateScoreDisplay();
+        }
+        else
+        {
+            currentMatch.TeamBScore = currentMatch.Runs;
+            currentMatch.TeamBWickets = currentMatch.Wickets;
+            currentMatch.TeamBOvers = currentMatch.OversDetails.Count;
+            await EndGame();
+        }
+    }
+
     private async void CheckForMatchWin()
     {
         if (!isFirstInnings)
         {
-            int target = teamATotalRuns + 1;
+            int target = currentMatch.TeamAScore + 1;
 
             if (currentMatch.Runs >= target && !matchEnded)
             {
                 matchEnded = true;
-
+                currentMatch.TeamBScore = currentMatch.Runs;
                 await DisplayAlert("Match Won", $"{currentMatch.TeamB} has won the match!", "OK");
 
                 bool endNow = await DisplayAlert("End Match?", "Would you like to end the match now?", "Yes", "No");
                 if (endNow)
                 {
-                    await Navigation.PushAsync(new SummaryPage(currentMatch, teamATotalRuns, teamAWickets, teamAOvers));
+                    await EndGame();
                 }
             }
         }
@@ -476,37 +509,32 @@ public partial class ScoringPage : ContentPage
         }
     }
 
-    private async Task EndInningsManually()
+    private async Task EndGame()
     {
-        if (currentOver.Deliveries.Count > 0)
+        currentMatch.IsMatchComplete = true;
+        try
         {
-            currentMatch.OversDetails.Add(currentOver);
-            currentOver = new Over();
-        }
+            Debug.WriteLine($"Overs count: {currentMatch.OversDetails.Count}");
 
-        if (isFirstInnings)
-        {
-            isFirstInnings = false;
+            foreach (var over in currentMatch.OversDetails)
+            {
+                Debug.WriteLine($"Over by: {over.Bowler}, Balls: {over.Deliveries?.Count}");
+                foreach (var ball in over.Deliveries)
+                {
+                    Debug.WriteLine($"Ball: {over.Batter1} & {over.Batter2}, Runs: {ball.Runs}, Wicket: {ball.IsWicket}");
+                }
+            }
 
-            teamATotalRuns = currentMatch.Runs;
-            teamAWickets = currentMatch.Wickets;
-            teamAOvers = currentMatch.OversDetails.Count;
-
-            currentMatch.Runs = 200; // Reset for Team B innings
-            currentMatch.Wickets = 0;
-            currentMatch.OversDetails.Clear();
-            ballsInCurrentOver = 0;
-            currentOver = new Over();
-
-            await DisplayAlert("New Innings", $"{currentMatch.TeamB} now batting to chase {teamATotalRuns} runs!", "OK");
-            UpdateScoreDisplay();
-        }
-        else
-        {
             // Both innings complete
             MatchResult result = MatchConverter.BuildMatchResult(currentMatch);
             await MatchSaver.SaveMatchResultAsync(result);
-            await Navigation.PushAsync(new SummaryPage(currentMatch, teamATotalRuns, teamAWickets, teamAOvers));
+            await Navigation.PushAsync(new SummaryPage(result));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to save match result: {ex.Message}", "OK");
+            // Optional: log deeper details
+            System.Diagnostics.Debug.WriteLine($"[EXCEPTION] {ex}");
         }
     }
 

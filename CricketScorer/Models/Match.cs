@@ -31,6 +31,11 @@ namespace CricketScorer.Models
 
         // Track who bowled each over
         public List<string> OverBowlers { get; set; } = new();
+        public int TeamAWickets { get; internal set; }
+        public int TeamAOvers { get; internal set; }
+        public int TeamBWickets { get; internal set; }
+        public int TeamBOvers { get; internal set; }
+
         public List<string> GetCurrentBatters(bool isFirstInnings)
         {
             return isFirstInnings ? TeamAPlayers : TeamBPlayers;

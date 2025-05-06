@@ -9,6 +9,8 @@ namespace CricketScorer.Models
     public class Over
     {
         public string Bowler { get; set; }
+        public string Batter1 { get; set; }
+        public string Batter2 { get; set; }
         public List<Ball> Deliveries { get; set; } = new();
     }
 }

@@ -3,11 +3,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CricketScorer.Views.SummaryPage"
              Title="SummaryPage">
-    <VerticalStackLayout Padding="20" Spacing="15">
-        <Label x:Name="MatchResultLabel" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
 
-        <Label x:Name="DetailedScoreLabel" FontSize="18" HorizontalOptions="Center" />
+            <!-- Result -->
+            <Label x:Name="ResultLabel"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
 
-        <Button Text="Back to Home" Clicked="OnBackHomeClicked" />
-    </VerticalStackLayout>
+            <!-- Final Scores -->
+            <Label x:Name="ScoreSummaryLabel"
+                   FontSize="18"
+                   HorizontalOptions="Center" />
+
+            <!-- Batting Pairs -->
+            <Label Text="Runs per Pair" FontSize="20" FontAttributes="Bold" />
+            <CollectionView x:Name="PairStatsList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,Auto" Padding="5">
+                            <Label Text="{Binding Pair}" Grid.Column="0" FontSize="16" />
+                            <Label Text="{Binding RunsScored}" Grid.Column="1" FontSize="16" HorizontalTextAlignment="End"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Bowler Stats -->
+            <Label Text="Bowling Stats" FontSize="20" FontAttributes="Bold" Margin="0,20,0,0"/>
+            <CollectionView x:Name="BowlerStatsList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,*,*" Padding="5">
+                            <Label Text="{Binding Bowler}" Grid.Column="0" FontSize="16"/>
+                            <Label Text="{Binding RunsConceded}" Grid.Column="1" FontSize="16" HorizontalTextAlignment="Center"/>
+                            <Label Text="{Binding Wickets}" Grid.Column="2" FontSize="16" HorizontalTextAlignment="End"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

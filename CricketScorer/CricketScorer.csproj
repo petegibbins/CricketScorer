@@ -21,7 +21,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>CricketScorer</ApplicationTitle>
+		<ApplicationTitle>SoftballCricketScorer</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.RedDogDigital.cricketscorer</ApplicationId>
@@ -37,7 +37,13 @@
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
-
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<UseInterpreter>true</UseInterpreter>
+		<RunAOTCompilation>false</RunAOTCompilation>
+		<AndroidLinkMode>None</AndroidLinkMode>
+		<!--  disables linker -->
+	</PropertyGroup>
+	
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />

@@ -4,45 +4,22 @@ namespace CricketScorer.Views;
 
 public partial class SummaryPage : ContentPage
 {
-    private Match completedMatch;
-    private int teamATotal, teamAWkts, teamAOvers;
-
-    public SummaryPage(Match match, int teamATotal, int teamAWickets, int teamAOvers)
+    public SummaryPage(MatchResult matchResult)
     {
         InitializeComponent();
-        completedMatch = match;
-        this.teamATotal = teamATotal;
-        this.teamAWkts = teamAWickets;
-        this.teamAOvers = teamAOvers;
-        DisplaySummary();
-    }
-    private void DisplaySummary()
-    {
-        MatchResultLabel.Text = $"{completedMatch.TeamA} vs {completedMatch.TeamB}";
 
-        string teamAStats = $"{completedMatch.TeamA}: {teamATotal}/{teamAWkts} in {teamAOvers} overs";
-        string teamBStats = $"{completedMatch.TeamB}: {completedMatch.Runs}/{completedMatch.Wickets} in {completedMatch.OversDetails.Count} overs";
+        ResultLabel.Text = matchResult.ResultText;
+        ScoreSummaryLabel.Text = $"{matchResult.TeamA}: {matchResult.TeamAScore}   {matchResult.TeamB}: {matchResult.TeamBScore}";
 
-        DetailedScoreLabel.Text = $"{teamAStats}\n{teamBStats}";
+        var pairDisplay = matchResult.BattingPairs
+            .Select(p => new
+            {
+                Pair = $"{p.Batter1} & {p.Batter2}",
+                RunsScored = p.RunsScored
+            }).ToList();
 
-        // Optional: Show who won
-        if (completedMatch.Runs > teamATotal)
-        {
-            DetailedScoreLabel.Text += $"\n\n{completedMatch.TeamB} WON!";
-        }
-        else if (completedMatch.Runs < teamATotal)
-        {
-            DetailedScoreLabel.Text += $"\n\n{completedMatch.TeamA} WON!";
-        }
-        else
-        {
-            DetailedScoreLabel.Text += $"\n\nMatch Tied!";
-        }
-    }
+        PairStatsList.ItemsSource = pairDisplay;
 
-    private async void OnBackHomeClicked(object sender, EventArgs e)
-    {
-        // Go back to the Home Page
-        await Navigation.PopToRootAsync();
+        BowlerStatsList.ItemsSource = matchResult.BowlingStats;
     }
 }

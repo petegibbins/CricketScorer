@@ -89,80 +89,37 @@
             </Frame>
         </VerticalStackLayout>
         <!-- NEW: Dimming overlay -->
-        <BoxView x:Name="DimBackground"
-             IsVisible="False"
-             BackgroundColor="Black"
-             Opacity="0.4"
-             InputTransparent="True"
-             Grid.RowSpan="1"
-             />
-        <Frame x:Name="BowlerPopup"
-                       IsVisible="False"
-                       BackgroundColor="White"
-                       BorderColor="DarkGreen"
-                       CornerRadius="20"
-                       Padding="20"
-                       VerticalOptions="Center"
-                       HorizontalOptions="Center"
-                       WidthRequest="300"
-                       HasShadow="True"
-                       ZIndex="9999">
+        <BoxView x:Name="DimBackground" IsVisible="False" BackgroundColor="Black" Opacity="0.4" InputTransparent="True" Grid.RowSpan="1" ZIndex="5" />
+        <Frame x:Name="BowlerPopup" IsVisible="False" BackgroundColor="White" BorderColor="DarkGreen" CornerRadius="20" Padding="20" VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="300" HasShadow="True" ZIndex="9999">
 
             <VerticalStackLayout Spacing="15">
-                <Label Text="Select Bowler"
-                           FontSize="22"
-                           FontAttributes="Bold"
-                           HorizontalOptions="Center"
-                           TextColor="DarkGreen"/>
+                <Label Text="Select Bowler" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" TextColor="DarkGreen"/>
 
                 <Grid HeightRequest="250">
 
                     <!-- Scrollable bowler list -->
-                    <CollectionView x:Name="BowlerList"
-                    SelectionMode="None"
-                    SelectionChanged="OnBowlerSelected" >
-
-
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                <Frame Padding="10"
-                                       Margin="5"
-                                       CornerRadius="12"
-                                       BackgroundColor="LightGray"
-                                       HasShadow="True">
+                    <CollectionView x:Name="BowlerList" SelectionMode="None" SelectionChanged="OnBowlerSelected" >
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Padding="10" Margin="5" CornerRadius="12" BackgroundColor="LightGray" HasShadow="True">
                                     <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnBowlerTapped" />
-                                </Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnBowlerTapped" />
+                                    </Frame.GestureRecognizers>
 
-                                        <Label Text="{Binding}"
-                           FontSize="20"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           TextColor="Black" />
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
+                                    <Label Text="{Binding}" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black" />
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
 
                     <!-- Fake "fade" overlay -->
-                    <BoxView x:Name="ScrollFadeOverlay" HeightRequest="30"
-                         VerticalOptions="End"
-                         BackgroundColor="White"
-                         Opacity="0.6"/>
+                    <BoxView x:Name="ScrollFadeOverlay" HeightRequest="30" VerticalOptions="End" BackgroundColor="White" Opacity="0.6"/>
 
                     <!-- Optional downward arrow -->
-                    <Label x:Name="ScrollHintLabel" Text="↓"
-                       FontSize="24"
-                       FontAttributes="Bold"
-                       TextColor="Gray"
-                       VerticalOptions="End"
-                       HorizontalOptions="Center"
-                       Margin="0,0,0,5" />
+                    <Label x:Name="ScrollHintLabel" Text="↓" FontSize="24" FontAttributes="Bold" TextColor="Gray" VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,5" />
                 </Grid>
 
-                <Button Text="Cancel"
-                            BackgroundColor="LightGray"
-                            Clicked="OnCancelBowlerPopup"/>
+                <Button Text="Cancel" BackgroundColor="LightGray" Clicked="OnCancelBowlerPopup"/>
             </VerticalStackLayout>
         </Frame>
     </Grid>
