@@ -27,7 +27,7 @@ namespace CricketScorer.Models
         public int TeamBScore { get; set; }
 
         public bool IsFirstInningsComplete { get; set; }
-        public bool IsFirstInnings { get; set; }
+        public bool IsFirstInnings { get; set; } = true; // Start with Team A batting first
 
         // Track who bowled each over
         public List<string> OverBowlers { get; set; } = new();

@@ -13,6 +13,8 @@ namespace CricketScorer.Models
         public bool IsWicket { get; set; }
         public bool IsWide { get; set; }
         public bool IsNoBall { get; set; }
+
+        public string DismissalType { get; set; }  // e.g. "Bowled", "Caught", etc.
         //public  string Batter1 { get; set; }
         //public  string Batter2 { get; set; }
 

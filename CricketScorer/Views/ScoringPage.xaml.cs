@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using CricketScorer.Helpers;
 using CricketScorer.Models;
 
@@ -145,10 +146,10 @@ public partial class ScoringPage : ContentPage
         return formatted;
     }
 
-    private void AddRuns(int runs, bool isWide = false, bool isNoBall = false)
+    private void AddRuns(Ball ball)
     {
         if (matchEnded) return; // Prevent scoring if match already won
-        currentMatch.Runs += runs;
+        currentMatch.Runs += ball.Runs;
         if (isFirstInnings)
         {
             currentMatch.TeamAScore = currentMatch.Runs;
@@ -158,14 +159,20 @@ public partial class ScoringPage : ContentPage
             currentMatch.TeamBScore = currentMatch.Runs;
         }
         ballsInCurrentOver++;
-
-        currentOver.Deliveries.Add(new Ball { Runs = runs, IsWide = isWide, IsNoBall = isNoBall, Batters = BattingPairLabel.Text });
-
-
-
+        currentOver.Deliveries.Add(ball);
         CheckForMatchWin();
         CheckOverComplete();
         UpdateScoreDisplay();
+    }
+
+    private void AddRuns(int runs, bool isWide = false, bool isNoBall = false)
+    {
+        AddRuns(new Ball
+        {
+            Runs = runs,
+            IsWide = isWide,
+            IsNoBall = isNoBall
+        });
     }
 
     private void OnOneRunClicked(object sender, EventArgs e)
@@ -183,21 +190,55 @@ public partial class ScoringPage : ContentPage
         AddRuns(6);
     }
 
-    private async void OnWicketClicked(object sender, EventArgs e)
+
+    private void OnWicketClicked(object sender, EventArgs e)
     {
-        if (matchEnded) return; // Prevent scoring if match already won
-        currentMatch.Wickets++;
-        currentMatch.Runs -= 5; // Softball cricket rule: lose 5 runs
-        if (currentMatch.Runs < 0)
-            currentMatch.Runs = 0; // Prevent negative total score if needed
+        var options = new List<string> { "Bowled", "Caught", "Run Out", "LBW", "Stumped", "Hit Wicket", "Other" };
+        var dismissalItems = options.Select(label => new DismissalOption { Label = label }).ToList();
 
-        ballsInCurrentOver++;
-        currentOver.Deliveries.Add(new Ball { Runs = 0, IsWicket = true });
+        DismissalList.ItemsSource = dismissalItems;
+        WicketPopup.IsVisible = true;
+        WicketDim.IsVisible = true;
+    }
 
-        await DisplayAlert("Wicket!", "-5 runs penalty applied.", "OK");
-        CheckForMatchWin();
-        CheckOverComplete();
-        UpdateScoreDisplay();
+
+    private void OnDismissalTapped(object sender, TappedEventArgs e)
+    {
+        if (sender is Frame frame && frame.BindingContext is DismissalOption tapped)
+        {
+            var list = DismissalList.ItemsSource as List<DismissalOption>;
+            foreach (var option in list)
+                option.IsSelected = false;
+
+            tapped.IsSelected = true;
+
+            // Refresh the UI
+            DismissalList.ItemsSource = null;
+            DismissalList.ItemsSource = list;
+
+            // Proceed with recording the wicket
+            var ball = new Ball
+            {
+                Runs = 0,
+                IsWicket = true,
+                DismissalType = tapped.Label,
+                Batters = $"{currentOver.Batter1} & {currentOver.Batter2}"
+            };
+
+            AddRuns(ball);
+            currentMatch.Wickets++;
+
+            WicketPopup.IsVisible = false;
+            WicketDim.IsVisible = false;
+
+            UpdateScoreDisplay();
+        }
+    }
+
+    private void OnCancelDismissalPopup(object sender, EventArgs e)
+    {
+        WicketPopup.IsVisible = false;
+        WicketDim.IsVisible = false;
     }
 
     private void OnEndOverClicked(object sender, EventArgs e)
@@ -249,6 +290,88 @@ public partial class ScoringPage : ContentPage
         await SelectNextBowler();
     }
 
+    private void ShowBattingPairPopup()
+    {
+        var batters = currentMatch.IsFirstInnings
+            ? currentMatch.TeamAPlayers
+            : currentMatch.TeamBPlayers;
+
+
+        BattingPairList.ItemsSource = batters
+            .Select(name => new BatterItem { Name = name, IsSelected = false })
+            .ToList();
+
+        BattingPairPopup.IsVisible = true;
+        BattingPairDim.IsVisible = true;
+    }
+
+    private void OnChangeBattingPairClicked(object sender, EventArgs e)
+    {
+        ShowBattingPairPopup();
+    }
+    private void OnBattingPairSelected(object sender, SelectionChangedEventArgs e)
+    {
+        ConfirmBattingPairButton.IsEnabled = e.CurrentSelection.Count == 2;
+    }
+
+    private void OnConfirmBattingPair(object sender, EventArgs e)
+    {
+        var items = BattingPairList.ItemsSource as List<BatterItem>;
+        var selected = items.Where(x => x.IsSelected).ToList();
+
+        if (selected.Count != 2)
+        {
+            DisplayAlert("Invalid", "Please select exactly 2 batters.", "OK");
+            return;
+        }
+
+        currentOver.Batter1 = selected[0].Name;
+        currentOver.Batter2 = selected[1].Name;
+
+        BattingPairPopup.IsVisible = false;
+        BattingPairDim.IsVisible = false;
+
+        UpdateBattingPairDisplay();
+
+        Debug.WriteLine($"Updated batters: {currentOver.Batter1} & {currentOver.Batter2}");
+    }
+    
+    private void OnBatterTapped(object sender, TappedEventArgs e)
+    {
+        if (sender is Frame frame && frame.BindingContext is BatterItem item)
+        {
+            var list = (BattingPairList.ItemsSource as List<BatterItem>);
+            if (item.IsSelected)
+            {
+                item.IsSelected = false;
+            }
+            else if (list.Count(x => x.IsSelected) < 2)
+            {
+                item.IsSelected = true;
+            }
+            else
+            {
+                DisplayAlert("Limit", "You can only select 2 batters.", "OK");
+            }
+
+            // Refresh UI — MAUI doesn’t auto-update bindings in list
+            BattingPairList.ItemsSource = null;
+            BattingPairList.ItemsSource = list;
+
+            ConfirmBattingPairButton.IsEnabled = list.Count(x => x.IsSelected) == 2;
+        }
+    }
+
+    private void UpdateBattingPairDisplay()
+    {
+        BattingPairLabel.Text = $"{currentOver.Batter1} & {currentOver.Batter2}";
+    }
+
+    private void OnCancelBattingPair(object sender, EventArgs e)
+    {
+        BattingPairPopup.IsVisible = false;
+        BattingPairDim.IsVisible = false;
+    }
     private async Task SelectNextBowler()
     {
         try
