@@ -48,6 +48,12 @@ public partial class ScoringPage : ContentPage
 
     private void UpdateScoreDisplay()
     {
+        if (currentMatch.IsFirstInningsComplete)
+        {
+            isFirstInnings = false;
+        }
+        currentOver.IsFirstInning = isFirstInnings;
+
         ScoreLabel.Text = $"Score: {currentMatch.Runs}/{currentMatch.Wickets}";
         OverLabel.Text = $"Overs: {currentMatch.OversDetails.Count}/{currentMatch.TotalOvers}";
         BattingTeamLabel.Text = isFirstInnings ? currentMatch.TeamA : currentMatch.TeamB;
@@ -160,6 +166,7 @@ public partial class ScoringPage : ContentPage
         }
         ballsInCurrentOver++;
         currentOver.Deliveries.Add(ball);
+        currentOver.IsFirstInning = isFirstInnings;
         CheckForMatchWin();
         CheckOverComplete();
         UpdateScoreDisplay();
@@ -404,6 +411,7 @@ public partial class ScoringPage : ContentPage
             currentOver.Batter1 = batters[currentMatch.CurrentPairIndex * 2];
             currentOver.Batter2 = batters[currentMatch.CurrentPairIndex * 2 + 1];
             currentOver.Bowler = currentBowler;
+            currentOver.IsFirstInning = isFirstInnings;
 
         }
         catch (Exception ex)
@@ -573,6 +581,7 @@ public partial class ScoringPage : ContentPage
 
             currentMatch.Runs = 200; // Reset for Team B innings
             currentMatch.Wickets = 0;
+            currentMatch.FirstInningsOvers = currentMatch.OversDetails.ToList();
             currentMatch.OversDetails.Clear();
             
             ballsInCurrentOver = 0;
@@ -591,6 +600,7 @@ public partial class ScoringPage : ContentPage
             currentMatch.TeamBScore = currentMatch.Runs;
             currentMatch.TeamBWickets = currentMatch.Wickets;
             currentMatch.TeamBOvers = currentMatch.OversDetails.Count;
+            currentMatch.SecondInningsOvers = currentMatch.OversDetails.ToList();
             await EndGame();
         }
     }

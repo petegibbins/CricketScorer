@@ -4,22 +4,21 @@ namespace CricketScorer.Views;
 
 public partial class SummaryPage : ContentPage
 {
-    public SummaryPage(MatchResult matchResult)
+    public SummaryPage(MatchResult result)
     {
         InitializeComponent();
 
-        ResultLabel.Text = matchResult.ResultText;
-        ScoreSummaryLabel.Text = $"{matchResult.TeamA}: {matchResult.TeamAScore}   {matchResult.TeamB}: {matchResult.TeamBScore}";
+        ResultLabel.Text = result.ResultText;
+        ScoreSummaryLabel.Text = $"{result.TeamA}: {result.TeamAScore}  {result.TeamB}: {result.TeamBScore}";
 
-        var pairDisplay = matchResult.BattingPairs
-            .Select(p => new
-            {
-                Pair = $"{p.Batter1} & {p.Batter2}",
-                RunsScored = p.RunsScored
-            }).ToList();
+        TeamAHeader.Text = $"{result.TeamA} Batting Summary";
+        TeamAScoreLabel.Text = $"Score: {result.TeamAScore}";
+        TeamAPairStatsList.ItemsSource = result.TeamABattingPairs;
+        TeamABowlerStatsList.ItemsSource = result.TeamBBowlingStats; // Team B bowled to Team A
 
-        PairStatsList.ItemsSource = pairDisplay;
-
-        BowlerStatsList.ItemsSource = matchResult.BowlingStats;
+        TeamBHeader.Text = $"{result.TeamB} Batting Summary";
+        TeamBScoreLabel.Text = $"Score: {result.TeamBScore}";
+        TeamBPairStatsList.ItemsSource = result.TeamBBattingPairs;
+        TeamBBowlerStatsList.ItemsSource = result.TeamABowlingStats; // Team A bowled to Team B
     }
 }

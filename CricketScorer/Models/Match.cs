@@ -36,6 +36,9 @@ namespace CricketScorer.Models
         public int TeamBWickets { get; internal set; }
         public int TeamBOvers { get; internal set; }
 
+        public List<Over> FirstInningsOvers { get; set; } = new();
+        public List<Over> SecondInningsOvers { get; set; } = new();
+
         public List<string> GetCurrentBatters(bool isFirstInnings)
         {
             return isFirstInnings ? TeamAPlayers : TeamBPlayers;

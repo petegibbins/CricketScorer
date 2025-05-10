@@ -9,6 +9,7 @@ namespace CricketScorer.Helpers
 {
     public static class MatchConverter
     {
+
         public static MatchResult BuildMatchResult(Match match)
         {
             var result = new MatchResult
@@ -19,12 +20,49 @@ namespace CricketScorer.Helpers
                 TeamBScore = match.TeamBScore,
                 DatePlayed = match.MatchDate,
                 ResultText = GenerateResultText(match),
-                BattingPairs = GetPairStats(match),
-                BowlingStats = GetBowlerStats(match)
+
+                // Split overs by innings
+                TeamAInnings = match.FirstInningsOvers,
+
+                TeamBInnings = match.SecondInningsOvers
             };
+
+            result.TeamABattingPairs = GetPairStats(match.FirstInningsOvers);
+            result.TeamBBattingPairs = GetPairStats(match.SecondInningsOvers);
+
+            result.TeamABowlingStats = GetBowlerStats(match.SecondInningsOvers); // Team A bowled to Team B
+            result.TeamBBowlingStats = GetBowlerStats(match.FirstInningsOvers); // Team B bowled to Team A
 
             return result;
         }
+
+
+        private static List<PairStat> GetPairStats(List<Over> overs)
+        {
+            var pairTotals = new Dictionary<(string, string), int>();
+
+            foreach (var over in overs)
+            {
+                var pair = GetSortedPairKey(over.Batter1, over.Batter2);
+                if (!pairTotals.ContainsKey(pair))
+                    pairTotals[pair] = 0;
+
+                foreach (var ball in over.Deliveries)
+                {
+                    pairTotals[pair] += ball.Runs;
+                    if (ball.IsWicket)
+                        pairTotals[pair] -= 5;
+                }
+            }
+
+            return pairTotals.Select(p => new PairStat
+            {
+                Batter1 = p.Key.Item1,
+                Batter2 = p.Key.Item2,
+                RunsScored = p.Value
+            }).ToList();
+        }
+
 
         private static string GenerateResultText(Match match)
         {
@@ -42,38 +80,12 @@ namespace CricketScorer.Helpers
                 return "Match tied";
         }
 
-        private static List<PairStat> GetPairStats(Match match)
-        {
-            var pairTotals = new Dictionary<(string, string), int>();
 
-            foreach (var over in match.OversDetails)
-            {
-                foreach (var ball in over.Deliveries)
-                {
-                    var pair = GetSortedPairKey(over.Batter1, over.Batter2);
-                    if (!pairTotals.ContainsKey(pair))
-                        pairTotals[pair] = 0;
-
-                    pairTotals[pair] += ball.Runs;
-
-                    if (ball.IsWicket)
-                        pairTotals[pair] -= 5; // softball rule
-                }
-            }
-
-            return pairTotals.Select(p => new PairStat
-            {
-                Batter1 = p.Key.Item1,
-                Batter2 = p.Key.Item2,
-                RunsScored = p.Value
-            }).ToList();
-        }
-
-        private static List<BowlerStat> GetBowlerStats(Match match)
+        private static List<BowlerStat> GetBowlerStats(List<Over> overs)
         {
             var bowlerMap = new Dictionary<string, BowlerStat>();
 
-            foreach (var over in match.OversDetails)
+            foreach (var over in overs)
             {
                 if (string.IsNullOrEmpty(over.Bowler)) continue;
 

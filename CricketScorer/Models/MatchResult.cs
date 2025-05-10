@@ -16,6 +16,14 @@ namespace CricketScorer.Models
         public List<BowlerStat> BowlingStats { get; set; } = new();
         public string ResultText { get; set; } // "Team A won by 12 runs"
         public DateTime DatePlayed { get; set; } = DateTime.Now;
+
+        public List<PairStat> TeamABattingPairs { get; set; }
+        public List<PairStat> TeamBBattingPairs { get; set; }
+
+        public List<BowlerStat> TeamABowlingStats { get; set; }
+        public List<BowlerStat> TeamBBowlingStats { get; set; }
+        public List<Over> TeamAInnings { get; internal set; }
+        public List<Over> TeamBInnings { get; internal set; }
     }
 
 }
