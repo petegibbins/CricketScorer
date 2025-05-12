@@ -6,8 +6,8 @@
 
     <VerticalStackLayout Padding="30" Spacing="20">
         <Label Text="Cricket Scorer" FontSize="32" HorizontalOptions="Center" />
-        <Button Text="Start New Match" Clicked="OnNewMatchClicked" Pressed="Button_Pressed" Released="Button_Released" />
-        <Button Text="New Match (With Player Setup)" BackgroundColor="DarkGreen" TextColor="White" Clicked="OnPlayerSetUpClicked" />
+        <Button Text="New Match" BackgroundColor="DarkGreen" TextColor="White" Clicked="OnPlayerSetUpClicked" />
+        <Button Text="New Match (Default teams)" BackgroundColor="DarkGreen" TextColor="White" Clicked="OnNewMatchDefaultTeamsClicked" />
         <Button Text="Start Demo Match" BackgroundColor="DodgerBlue" TextColor="White" Clicked="OnStartDemoMatchClicked" />
         <Button Text="Start Hundred Demo Match" BackgroundColor="LightYellow" TextColor="Black" Clicked="OnStartDemo100MatchClicked" />
 

@@ -26,6 +26,7 @@ public partial class NewMatchPage : ContentPage
         currentMatch.TeamA = teamA;
         currentMatch.TeamB = teamB;
         currentMatch.StartingRuns = startingRuns;
+        currentMatch.Runs = startingRuns;
         currentMatch.Format = FormatPicker.SelectedIndex == 1 ? Match.MatchFormat.Hundred : Match.MatchFormat.Standard;
         currentMatch.TotalOvers = overs;
 

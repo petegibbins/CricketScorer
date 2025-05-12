@@ -11,9 +11,22 @@ namespace CricketScorer.Views
             InitializeComponent();
         }
 
-        private async void OnNewMatchClicked(object sender, EventArgs e)
+        private async void OnNewMatchDefaultTeamsClicked(object sender, EventArgs e)
         {
-            Match match = new Match();
+            var match = new Match
+            {
+                TeamA = "Twistas",
+                TeamB = "Bury",
+                MatchDate = DateTime.Now,
+                TeamAPlayers = new List<string> { "Kitch", "Katrina", "Gemma", "Di", "Emily", "Kate", "Bianka", "Babs" },
+                TeamBPlayers = new List<string> { "Lisa", "Marta", "Antonia", "Lana", "Maya", "Nina", "Olive", "Paula" },
+                TeamAScore = 200,
+                TeamBScore = 200,
+                Format = Match.MatchFormat.Standard,
+                StartingRuns = 200,
+                TotalOvers = 8,
+                Runs = 200
+            };
             await Navigation.PushAsync(new NewMatchPage(match));
         }
 

@@ -15,7 +15,7 @@ namespace CricketScorer.Views
             this.match = match;
             this.isTeamA = isTeamA;
 
-            Title = isTeamA ? "Team A Setup" : "Team B Setup";
+            Title = isTeamA ? match.TeamA + " setup" : match.TeamB + " setup";
         }
 
         private void OnAddPlayerClicked(object sender, EventArgs e)
