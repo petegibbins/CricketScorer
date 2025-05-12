@@ -44,6 +44,16 @@ namespace CricketScorer.Models
             return isFirstInnings ? TeamAPlayers : TeamBPlayers;
         }
 
+        public MatchFormat Format { get; set; } = MatchFormat.Standard;
+        public int StartingRuns { get; set; } = 200;
+
+        public int BallsPerOver => Format == MatchFormat.Hundred ? 5 : 6;
+        public enum MatchFormat
+        {
+            Standard, // 6-ball overs
+            Hundred   // 5-ball overs, 100 total balls
+        }
+
     }
 
 

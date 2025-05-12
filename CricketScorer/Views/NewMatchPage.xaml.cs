@@ -18,29 +18,32 @@ public partial class NewMatchPage : ContentPage
 
     private async void OnStartScoringClicked(object sender, EventArgs e)
     {
-        string teamA = TeamAEntry.Text;
-        string teamB = TeamBEntry.Text;
-        int startingRuns = int.TryParse(RunsEntry.Text, out var r) ? r : 0;
-        int oversInMatch = int.TryParse(OversEntry.Text, out var o) ? o : 0;
+        string teamA = TeamAEntry.Text?.Trim();
+        string teamB = TeamBEntry.Text?.Trim();
+        int overs = int.TryParse(OversEntry.Text, out var o) ? o : 0;
+        int startingRuns = int.TryParse(RunsEntry.Text, out var r) ? r : 200;
 
-        if (oversInMatch <= 0)
+        currentMatch.TeamA = teamA;
+        currentMatch.TeamB = teamB;
+        currentMatch.StartingRuns = startingRuns;
+        currentMatch.Format = FormatPicker.SelectedIndex == 1 ? Match.MatchFormat.Hundred : Match.MatchFormat.Standard;
+        currentMatch.TotalOvers = overs;
+
+        await Navigation.PushAsync(new ScoringPage(currentMatch));
+    }
+
+    private void OnFormatChanged(object sender, EventArgs e)
+    {
+        if (FormatPicker.SelectedIndex == 1) // The Hundred
         {
-            await DisplayAlert("Error", "Please enter a valid number of overs.", "OK");
-            return;
+            OversEntry.Text = "20";
+            OversEntry.IsEnabled = false; // Optional: lock the field
         }
         else
         {
-            currentMatch.TotalOvers = oversInMatch;
-            currentMatch.Runs = startingRuns;
+            OversEntry.Text = string.Empty;
+            OversEntry.IsEnabled = true;
         }
-
-        if (string.IsNullOrWhiteSpace(teamA) || string.IsNullOrWhiteSpace(teamB) || oversInMatch <= 0)
-        {
-            await DisplayAlert("Error", "Please fill in all fields correctly.", "OK");
-            return;
-        }
-
-        await Navigation.PushAsync(new ScoringPage(currentMatch));
     }
 
     private async void OnButtonPressed(object sender, EventArgs e)

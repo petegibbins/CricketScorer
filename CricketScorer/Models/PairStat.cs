@@ -12,6 +12,8 @@ namespace CricketScorer.Models
         public required string Batter2 { get; set; }
         public int RunsScored { get; set; }
 
+        public int WicketsLost { get; set; }
+
         public string Pair => $"{Batter1} & {Batter2}";
     }
 }

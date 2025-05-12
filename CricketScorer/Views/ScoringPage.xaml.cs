@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using CricketScorer.Helpers;
 using CricketScorer.Models;
 
@@ -14,7 +13,7 @@ public partial class ScoringPage : ContentPage
     private bool isFirstInnings = true;
     private bool matchEnded = false;
     private string currentBowler = string.Empty;
-    private bool showBowlerPopup = false;
+    private bool showBowlerPopup;
     private List<string> availableBowlers = new();
 
 
@@ -118,6 +117,7 @@ public partial class ScoringPage : ContentPage
         {
             LastOver2Label.Text = "-";
         }
+        UpdateRequiredRunRate();
     }
 
     private FormattedString BuildOverFormattedString(Over over, int overNumber)
@@ -150,6 +150,32 @@ public partial class ScoringPage : ContentPage
         }
 
         return formatted;
+    }
+
+    private void UpdateRequiredRunRate()
+    {
+        if (!currentMatch.IsFirstInnings)
+        {
+            double runsRemaining = currentMatch.TeamAScore - currentMatch.TeamBScore + 1;
+            int ballsBowled = currentMatch.OversDetails.Sum(o => o.Deliveries.Count);
+            int ballsRemaining = currentMatch.TotalOvers * currentMatch.BallsPerOver - ballsBowled;
+
+            if (ballsRemaining > (double)currentMatch.BallsPerOver)
+            {
+                double requiredRate = runsRemaining / (ballsRemaining / (double)currentMatch.BallsPerOver);
+                RequiredRunRateLabel.Text = $"Required Run Rate: {requiredRate:0.00}";
+                RequiredRunRateLabel.IsVisible = true;
+            }
+            else
+            {
+                RequiredRunRateLabel.Text = "Innings Complete";
+                RequiredRunRateLabel.IsVisible = true;
+            }
+        }
+        else
+        {
+            RequiredRunRateLabel.IsVisible = false;
+        }
     }
 
     private void AddRuns(Ball ball)
@@ -256,7 +282,7 @@ public partial class ScoringPage : ContentPage
 
     private void CheckOverComplete()
     {
-        if (ballsInCurrentOver >= 6)
+        if (currentOver.Deliveries.Count == currentMatch.BallsPerOver)
         {
             EndOver();
         }

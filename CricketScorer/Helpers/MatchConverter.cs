@@ -40,26 +40,36 @@ namespace CricketScorer.Helpers
         private static List<PairStat> GetPairStats(List<Over> overs)
         {
             var pairTotals = new Dictionary<(string, string), int>();
+            var pairWickets = new Dictionary<(string, string), int>();
 
             foreach (var over in overs)
             {
                 var pair = GetSortedPairKey(over.Batter1, over.Batter2);
                 if (!pairTotals.ContainsKey(pair))
+                {
                     pairTotals[pair] = 0;
+                    pairWickets[pair] = 0;
+                }
 
                 foreach (var ball in over.Deliveries)
                 {
                     pairTotals[pair] += ball.Runs;
                     if (ball.IsWicket)
+                    {
                         pairTotals[pair] -= 5;
+                        pairWickets[pair] += 1;
+                    }
                 }
+
+
             }
 
             return pairTotals.Select(p => new PairStat
             {
                 Batter1 = p.Key.Item1,
                 Batter2 = p.Key.Item2,
-                RunsScored = p.Value
+                RunsScored = p.Value,
+                WicketsLost = pairWickets[p.Key]
             }).ToList();
         }
 
@@ -67,7 +77,7 @@ namespace CricketScorer.Helpers
         private static string GenerateResultText(Match match)
         {
             if (match.TeamAScore > match.TeamBScore)
-                if(match.TeamAScore - match.TeamBScore == 1)
+                if (match.TeamAScore - match.TeamBScore == 1)
                     return $"{match.TeamA} won by 1 run";
                 else
                     return $"{match.TeamA} won by {match.TeamAScore - match.TeamBScore} runs";
@@ -112,7 +122,7 @@ namespace CricketScorer.Helpers
 
         private static (string, string) GetSortedPairKey(string b1, string b2)
         {
-            if(string.IsNullOrWhiteSpace(b1)) b1 = "?";
+            if (string.IsNullOrWhiteSpace(b1)) b1 = "?";
             if (string.IsNullOrWhiteSpace(b2)) b2 = "?";
             return string.Compare(b1, b2) <= 0 ? (b1, b2) : (b2, b1);
         }

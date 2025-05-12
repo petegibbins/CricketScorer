@@ -12,6 +12,7 @@
             <!-- Overall Score Summary -->
             <Label x:Name="ScoreSummaryLabel" FontSize="18" HorizontalOptions="Center" TextColor="Black" Margin="0,0,0,20" />
 
+
             <!-- TEAM A Summary -->
             <Label x:Name="TeamAHeader" FontSize="20" FontAttributes="Bold" TextColor="DarkBlue" />
             <Label x:Name="TeamAScoreLabel" FontSize="16" HorizontalOptions="Start" />
@@ -22,13 +23,27 @@
                     <DataTemplate>
                         <Grid ColumnDefinitions="*,Auto" Padding="5">
                             <Label Text="{Binding Pair}" Grid.Column="0" FontSize="14" />
-                            <Label Text="{Binding RunsScored}" Grid.Column="1" FontSize="14" HorizontalTextAlignment="End"/>
+                            <Label Grid.Column="1">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding RunsScored}" />
+                                        <Span Text=" (" />
+                                        <Span Text="{Binding WicketsLost}" />
+                                        <Span Text=" wickets)" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
             <Label Text="Bowling Stats" FontSize="16" FontAttributes="Bold" Margin="0,10,0,0"/>
+            <Grid ColumnDefinitions="*,*,*" Padding="5,0" Margin="0,5,0,0">
+                <Label Text="Bowler" Grid.Column="0" FontSize="14" FontAttributes="Bold" />
+                <Label Text="Runs" Grid.Column="1" FontSize="14" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                <Label Text="Wkts" Grid.Column="2" FontSize="14" FontAttributes="Bold" HorizontalTextAlignment="End" />
+            </Grid>
             <CollectionView x:Name="TeamABowlerStatsList">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -40,9 +55,10 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-
+            
+            <BoxView HeightRequest="1" BackgroundColor="DarkGray" Margin="0,0,0,4"/>
             <!-- TEAM B Summary -->
-            <Label x:Name="TeamBHeader" FontSize="20" FontAttributes="Bold" TextColor="DarkGreen" Margin="0,20,0,0" />
+            <Label x:Name="TeamBHeader" FontSize="20" FontAttributes="Bold" TextColor="DarkGreen" Margin="0,0,0,0" />
             <Label x:Name="TeamBScoreLabel" FontSize="16" HorizontalOptions="Start" />
 
             <Label Text="Runs per Pair" FontSize="16" FontAttributes="Bold" />
@@ -51,13 +67,27 @@
                     <DataTemplate>
                         <Grid ColumnDefinitions="*,Auto" Padding="5">
                             <Label Text="{Binding Pair}" Grid.Column="0" FontSize="14" />
-                            <Label Text="{Binding RunsScored}" Grid.Column="1" FontSize="14" HorizontalTextAlignment="End"/>
+                            <Label Grid.Column="1">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding RunsScored}" />
+                                        <Span Text=" (" />
+                                        <Span Text="{Binding WicketsLost}" />
+                                        <Span Text=" wickets)" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
             <Label Text="Bowling Stats" FontSize="16" FontAttributes="Bold" Margin="0,10,0,0"/>
+            <Grid ColumnDefinitions="*,*,*" Padding="5,0" Margin="0,5,0,0">
+                <Label Text="Bowler" Grid.Column="0" FontSize="14" FontAttributes="Bold" />
+                <Label Text="Runs" Grid.Column="1" FontSize="14" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                <Label Text="Wkts" Grid.Column="2" FontSize="14" FontAttributes="Bold" HorizontalTextAlignment="End" />
+            </Grid>
             <CollectionView x:Name="TeamBBowlerStatsList">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
