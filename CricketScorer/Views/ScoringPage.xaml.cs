@@ -707,8 +707,24 @@ public partial class ScoringPage : ContentPage
 
         if (!string.IsNullOrWhiteSpace(result))
         {
-            if (int.TryParse(result, out int customRuns) && customRuns >= 0)
+            int.TryParse(result, out int customRuns);
+            // Simulate some custom run scenarios for testing
+            if (customRuns == -100)
             {
+                throw new InvalidOperationException("Simulated exception crash (-100)");
+            }
+            else if (customRuns == -200)
+            {
+                Environment.FailFast("Simulated app termination (-200)");
+            }
+            else if (customRuns == -300)
+            {
+                throw new DivideByZeroException("Divide by zero simulated (-300)");
+            }
+            
+            if ((customRuns >= 0))
+            {
+                // Actually add the custom runs
                 AddRuns(customRuns);
             }
             else
