@@ -641,6 +641,14 @@ public partial class ScoringPage : ContentPage
             {
                 matchEnded = true;
                 currentMatch.TeamBScore = currentMatch.Runs;
+
+                // Fix: Ensure last over is added, even if incomplete
+                if (currentOver.Deliveries.Count > 0)
+                {
+                    currentMatch.OversDetails.Add(currentOver);
+                }
+
+                currentMatch.SecondInningsOvers = currentMatch.OversDetails.ToList();
                 await DisplayAlert("Match Won", $"{currentMatch.TeamB} has won the match!", "OK");
 
                 bool endNow = await DisplayAlert("End Match?", "Would you like to end the match now?", "Yes", "No");
@@ -682,6 +690,12 @@ public partial class ScoringPage : ContentPage
                 {
                     Debug.WriteLine($"Ball: {over.Batter1} & {over.Batter2}, Runs: {ball.Runs}, Wicket: {ball.IsWicket}");
                 }
+            }
+
+            // Ensure the last over is added, even if incomplete
+            if (!currentMatch.OversDetails.Contains(currentOver) && currentOver.Deliveries.Count > 0)
+            {
+                currentMatch.OversDetails.Add(currentOver);
             }
 
             // Both innings complete
