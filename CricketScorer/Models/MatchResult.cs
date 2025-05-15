@@ -24,6 +24,10 @@ namespace CricketScorer.Models
         public List<BowlerStat> TeamBBowlingStats { get; set; }
         public List<Over> TeamAInnings { get; internal set; }
         public List<Over> TeamBInnings { get; internal set; }
+        public int TeamAExtras { get; set; }
+        public int TeamBExtras { get; set; }
+        public int TeamABattingRuns { get; set; }
+        public int TeamBBattingRuns { get; set; }
     }
 
 }

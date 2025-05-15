@@ -27,15 +27,35 @@ namespace CricketScorer.Helpers
                 TeamBInnings = match.SecondInningsOvers
             };
 
+            result.TeamABattingRuns = CalculateBattingRuns(match.FirstInningsOvers);
+            result.TeamAExtras = CalculateExtras(match.FirstInningsOvers);
+
+            result.TeamBBattingRuns = CalculateBattingRuns(match.SecondInningsOvers);
+            result.TeamBExtras = CalculateExtras(match.SecondInningsOvers);
+
             result.TeamABattingPairs = GetPairStats(match.FirstInningsOvers);
             result.TeamBBattingPairs = GetPairStats(match.SecondInningsOvers);
 
             result.TeamABowlingStats = GetBowlerStats(match.SecondInningsOvers); // Team A bowled to Team B
             result.TeamBBowlingStats = GetBowlerStats(match.FirstInningsOvers); // Team B bowled to Team A
 
+
             return result;
         }
 
+        private static int CalculateBattingRuns(List<Over> overs)
+        {
+            return overs.SelectMany(o => o.Deliveries)
+                        .Where(b => !b.IsNoBall && !b.IsWide && !b.IsWicket)
+                        .Sum(b => b.Runs);
+        }
+
+        private static int CalculateExtras(List<Over> overs)
+        {
+            return overs.SelectMany(o => o.Deliveries)
+                        .Where(b => b.IsNoBall || b.IsWide)
+                        .Sum(b => b.Runs);
+        }
 
         private static List<PairStat> GetPairStats(List<Over> overs)
         {
@@ -111,7 +131,15 @@ namespace CricketScorer.Helpers
 
                 foreach (var ball in over.Deliveries)
                 {
-                    bowlerMap[over.Bowler].RunsConceded += ball.Runs;
+                    if (ball.IsNoBall || ball.IsWide)
+                    {
+                        bowlerMap[over.Bowler].ExtrasConceded += ball.Runs;
+                    }
+                    else
+                    {
+                        bowlerMap[over.Bowler].RunsConceded += ball.Runs;
+                    }
+
                     if (ball.IsWicket)
                         bowlerMap[over.Bowler].Wickets += 1;
                 }

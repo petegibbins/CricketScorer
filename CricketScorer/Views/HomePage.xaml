@@ -10,6 +10,7 @@
         <Button Text="New Match (Default teams)" BackgroundColor="DarkGreen" TextColor="White" Clicked="OnNewMatchDefaultTeamsClicked" />
         <Button Text="Start Demo Match" BackgroundColor="DodgerBlue" TextColor="White" Clicked="OnStartDemoMatchClicked" />
         <Button Text="Start Hundred Demo Match" BackgroundColor="LightYellow" TextColor="Black" Clicked="OnStartDemo100MatchClicked" />
+        <Button Text="View Saved Matches" BackgroundColor="DodgerBlue" TextColor="White" Clicked="OnViewSavedMatchesClicked" />
 
     </VerticalStackLayout>
 

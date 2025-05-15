@@ -11,6 +11,20 @@ namespace CricketScorer.Views
             InitializeComponent();
         }
 
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            Match inProgressMatch = MatchSaver.TryLoadSavedMatch(new Match());
+            if (inProgressMatch != null)
+            {
+                var result = await DisplayAlert("Resume Match", "There is a match in progress. Do you want to resume it?", "Yes", "No");
+                if (result)
+                {
+                    await Navigation.PushAsync(new ScoringPage(inProgressMatch));
+                }
+            }
+        }
+
         private async void OnNewMatchDefaultTeamsClicked(object sender, EventArgs e)
         {
             var match = new Match
@@ -275,6 +289,11 @@ namespace CricketScorer.Views
             match.TeamAOvers = match.FirstInningsOvers.Count;
             match.TeamBOvers = match.SecondInningsOvers.Count;
             await Navigation.PushAsync(new ScoringPage(match));
+        }
+
+        private async void OnViewSavedMatchesClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new FilesViewPage());
         }
     }
 

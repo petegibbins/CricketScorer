@@ -11,5 +11,6 @@ namespace CricketScorer.Models
         public string Bowler { get; set; }
         public int RunsConceded { get; set; }
         public int Wickets { get; set; }
+        public int ExtrasConceded { get; set; }  // NEW
     }
 }

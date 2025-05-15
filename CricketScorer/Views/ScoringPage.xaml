@@ -90,12 +90,14 @@
             <!-- Last Two Overs -->
             <Frame CornerRadius="20" Padding="15" BackgroundColor="#e6f2ff" HasShadow="True" Margin="0,20,0,0">
 
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Last 2 Overs" FontAttributes="Bold" FontSize="20" HorizontalOptions="Center" TextColor="DarkBlue" />
-
-                    <Label x:Name="LastOver1Label" HorizontalOptions="Center" />
-                    <Label x:Name="LastOver2Label" HorizontalOptions="Center" />
-                </VerticalStackLayout>
+                <Grid Padding="10">
+                    <Label x:Name="LastOversLabel"
+                           FontSize="16"
+                           FontFamily="Courier New"
+                           LineBreakMode="NoWrap"
+                           HorizontalOptions="Start"
+                           VerticalOptions="Center" />
+                </Grid>
 
             </Frame>
         </VerticalStackLayout>

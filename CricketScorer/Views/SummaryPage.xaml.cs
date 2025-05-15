@@ -12,12 +12,12 @@ public partial class SummaryPage : ContentPage
         ScoreSummaryLabel.Text = $"{result.TeamA}: {result.TeamAScore}  {result.TeamB}: {result.TeamBScore}";
 
         TeamAHeader.Text = $"{result.TeamA} Summary";
-        TeamAScoreLabel.Text = $"Score: {result.TeamAScore}";
+        TeamAScoreLabel.Text = $"Score: {result.TeamAScore} (Batting {result.TeamABattingRuns}, Extras {result.TeamAExtras})";
         TeamAPairStatsList.ItemsSource = result.TeamABattingPairs;
         TeamABowlerStatsList.ItemsSource = result.TeamBBowlingStats; // Team B bowled to Team A
 
         TeamBHeader.Text = $"{result.TeamB} Summary";
-        TeamBScoreLabel.Text = $"Score: {result.TeamBScore}";
+        TeamBScoreLabel.Text = $"Score: {result.TeamBScore} (Batting {result.TeamBBattingRuns}, Extras {result.TeamBExtras})";
         TeamBPairStatsList.ItemsSource = result.TeamBBattingPairs;
         TeamBBowlerStatsList.ItemsSource = result.TeamABowlingStats; // Team A bowled to Team B
     }

@@ -44,6 +44,9 @@ namespace CricketScorer.Models
             return isFirstInnings ? TeamAPlayers : TeamBPlayers;
         }
 
+        public string? CurrentBowler { get; set; }
+
+        public Over? CurrentOver { get; set; }
         public MatchFormat Format { get; set; } = MatchFormat.Standard;
         public int StartingRuns { get; set; } = 200;
 
