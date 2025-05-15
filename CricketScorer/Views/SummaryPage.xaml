@@ -103,7 +103,7 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-
+            <Button Text="Share Match Summary" Clicked="OnShareSummaryClicked" HorizontalOptions="Center" Margin="0,20,0,0" />    
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

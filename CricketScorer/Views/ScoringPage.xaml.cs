@@ -15,6 +15,7 @@ public partial class ScoringPage : ContentPage
     private bool showBowlerPopup;
     private List<string> availableBowlers = new();
     private bool isSelectingBowler = false;
+    private bool pendingEndOver = false; // Flag to check if end over is pending so we can show the popup again if needed
 
 
     public ScoringPage(Match match)
@@ -239,7 +240,6 @@ public partial class ScoringPage : ContentPage
         DismissalList.ItemsSource = dismissalItems;
         WicketPopup.IsVisible = true;
         WicketDim.IsVisible = true;
-        AddRuns(new Ball() { IsWicket = true});
     }
 
 
@@ -273,6 +273,13 @@ public partial class ScoringPage : ContentPage
             WicketDim.IsVisible = false;
 
             UpdateScoreDisplay();
+            
+            // If the wicket was the last ball of the over, we need to hold the EndOver pop up until the dismissal is confirmed
+            if (pendingEndOver)
+            {
+                pendingEndOver = false;
+                EndOver(); // Now run it safely
+            }
         }
     }
 
@@ -292,7 +299,14 @@ public partial class ScoringPage : ContentPage
     {
         if (currentOver.Deliveries.Count == currentMatch.BallsPerOver)
         {
-            EndOver();
+            if (WicketPopup.IsVisible)
+            {
+                pendingEndOver = true;
+            }
+            else
+            {
+                EndOver();
+            }
         }
     }
 
@@ -308,6 +322,16 @@ public partial class ScoringPage : ContentPage
         ballsInCurrentOver = 0;
         UpdateScoreDisplay();
 
+        if (currentMatch.OversDetails.Count >= currentMatch.TotalOvers)
+        {
+            bool endNow = await DisplayAlert("Overs Complete", "The maximum number of overs is reached. End the innings now?", "Yes", "No");
+            if (endNow)
+            {
+                await EndInningsManually();
+                return;
+            }
+        }
+
         // NEW: Check if time to swap batting pair
         int oversBowled = currentMatch.OversDetails.Count;
         if (oversBowled % currentMatch.OversPerPair == 0)
@@ -320,14 +344,6 @@ public partial class ScoringPage : ContentPage
             }
         }
 
-        if (currentMatch.OversDetails.Count >= currentMatch.TotalOvers)
-        {
-            bool endNow = await DisplayAlert("Overs Complete", "The maximum number of overs is reached. End the innings now?", "Yes", "No");
-            if (endNow)
-            {
-                await EndInningsManually();
-            }
-        }
         await SelectNextBowler();
     }
 
