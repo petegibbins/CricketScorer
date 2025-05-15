@@ -140,7 +140,7 @@ namespace CricketScorer.Helpers
                         bowlerMap[over.Bowler].RunsConceded += ball.Runs;
                     }
 
-                    if (ball.IsWicket)
+                    if (ball.IsWicket && ball.DismissalType != "Stumped")
                         bowlerMap[over.Bowler].Wickets += 1;
                 }
             }
