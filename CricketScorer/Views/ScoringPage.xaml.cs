@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using CricketScorer.Helpers;
-using CricketScorer.Models;
+using CricketScorer.Core.Models;
+using CricketScorer.Core.Services;
 
 namespace CricketScorer.Views;
 
@@ -22,11 +23,8 @@ public partial class ScoringPage : ContentPage
     {
         InitializeComponent();
         currentMatch = match;
-        //UpdateScoreDisplay();
         NavigationPage.SetHasNavigationBar(this, false);
         NavigationPage.SetHasBackButton(this, false);
-        // showBowlerPopup = true;
-        // BowlerPopup.IsVisible = true;
     }
 
     protected override async void OnAppearing()

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CricketScorer.Models
+namespace CricketScorer.Core.Models
 {
     public class MatchResult
     {
@@ -22,8 +22,8 @@ namespace CricketScorer.Models
 
         public List<BowlerStat> TeamABowlingStats { get; set; }
         public List<BowlerStat> TeamBBowlingStats { get; set; }
-        public List<Over> TeamAInnings { get; internal set; }
-        public List<Over> TeamBInnings { get; internal set; }
+        public List<Over> TeamAInnings { get;  set; }
+        public List<Over> TeamBInnings { get;  set; }
         public int TeamAExtras { get; set; }
         public int TeamBExtras { get; set; }
         public int TeamABattingRuns { get; set; }

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using CricketScorer.Helpers;
-using CricketScorer.Models;
+using CricketScorer.Core.Models;
 
 namespace CricketScorer.Views
 {

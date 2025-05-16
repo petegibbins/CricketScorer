@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using CricketScorer.Models;
+using CricketScorer.Core.Models;
 
 namespace CricketScorer.Views
 {

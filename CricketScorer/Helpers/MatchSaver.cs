@@ -1,10 +1,7 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.IO;
-using CricketScorer.Models;
 using CommunityToolkit.Maui.Alerts;
 using System.Diagnostics;
-
+using CricketScorer.Core.Models;
 public static class MatchSaver
 {
     public static async Task SaveMatchResultAsync(MatchResult result)

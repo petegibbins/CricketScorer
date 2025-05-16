@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CricketScorer.Models
+namespace CricketScorer.Core.Models
 {
     public class Match
     {
@@ -31,10 +31,10 @@ namespace CricketScorer.Models
 
         // Track who bowled each over
         public List<string> OverBowlers { get; set; } = new();
-        public int TeamAWickets { get; internal set; }
-        public int TeamAOvers { get; internal set; }
-        public int TeamBWickets { get; internal set; }
-        public int TeamBOvers { get; internal set; }
+        public int TeamAWickets { get;  set; }
+        public int TeamAOvers { get;  set; }
+        public int TeamBWickets { get;  set; }
+        public int TeamBOvers { get;  set; }
 
         public List<Over> FirstInningsOvers { get; set; } = new();
         public List<Over> SecondInningsOvers { get; set; } = new();
