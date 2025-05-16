@@ -19,7 +19,8 @@ public static class MatchConverter
         result.TeamABowlingStats = SummariseBowling(match.SecondInningsOvers);
         result.TeamABattingRuns = TotalBattingRuns(match.FirstInningsOvers);
         result.TeamAExtras = TotalExtras(match.FirstInningsOvers);
-        result.TeamAScore = result.TeamABattingRuns + result.TeamAExtras;
+        int teamAWickets = match.FirstInningsOvers.SelectMany(o => o.Deliveries).Count(b => b.IsWicket);
+        result.TeamAScore = result.TeamABattingRuns + result.TeamAExtras - (teamAWickets * 5);
 
         // Second innings: Team B bats
         result.TeamBInnings = match.SecondInningsOvers;
@@ -27,7 +28,8 @@ public static class MatchConverter
         result.TeamBBowlingStats = SummariseBowling(match.FirstInningsOvers);
         result.TeamBBattingRuns = TotalBattingRuns(match.SecondInningsOvers);
         result.TeamBExtras = TotalExtras(match.SecondInningsOvers);
-        result.TeamBScore = result.TeamBBattingRuns + result.TeamBExtras;
+        int teamBWickets = match.SecondInningsOvers.SelectMany(o => o.Deliveries).Count(b => b.IsWicket);
+        result.TeamBScore = result.TeamBBattingRuns + result.TeamBExtras - (teamBWickets * 5);
 
         // All pair stats flat list
         result.BattingPairs = result.TeamABattingPairs.Concat(result.TeamBBattingPairs).ToList();
@@ -105,9 +107,9 @@ public static class MatchConverter
     private static string GetResultText(MatchResult result)
     {
         if (result.TeamAScore > result.TeamBScore)
-            return $"{result.TeamA} won by {result.TeamAScore - result.TeamBScore} runs";
+            return $"{result.TeamA} won by {result.TeamAScore - result.TeamBScore} run{(result.TeamAScore - result.TeamBScore == 1 ? "" : "s")}";
         else if (result.TeamBScore > result.TeamAScore)
-            return $"{result.TeamB} won by {result.TeamBScore - result.TeamAScore} runs";
+            return $"{result.TeamB} won by {result.TeamBScore - result.TeamAScore} run{(result.TeamBScore - result.TeamAScore == 1 ? "" : "s")}";
         else
             return "Match tied";
     }

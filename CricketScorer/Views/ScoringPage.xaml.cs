@@ -45,7 +45,7 @@ public partial class ScoringPage : ContentPage
 
         if (currentMatch.OversDetails.Count == 0 && string.IsNullOrEmpty(currentMatch.CurrentBowler))
         {
-            await SelectNextBowler();   
+            await SelectNextBowler();
         }
         UpdateScoreDisplay();
     }
@@ -79,24 +79,14 @@ public partial class ScoringPage : ContentPage
 
         if (!isFirstInnings)
         {
-            int target = currentMatch.TeamAScore + 1; // Must beat Team A's total
-            int runsNeeded = target - currentMatch.Runs;
-
-            if (runsNeeded > 0)
-            {
-                TargetLabel.Text = $"Needs {runsNeeded} more to win";
-            }
-            else
-            {
-                TargetLabel.Text = $"{currentMatch.TeamB} has won!";
-            }
+            var formatter = new Formatter();
+            TargetLabel.Text = formatter.FormatTargetLabel(currentMatch);
         }
         else
         {
-            TargetLabel.Text = ""; // Hide during first innings
+            TargetLabel.Text = string.Empty;
         }
-
-        LastOversLabel.FormattedText = BuildFormattedLastOversString();
+            LastOversLabel.FormattedText = BuildFormattedLastOversString();
         UpdateRequiredRunRate();
     }
 
@@ -184,7 +174,7 @@ public partial class ScoringPage : ContentPage
 
         if (ball.IsWicket)
         {
-         currentMatch.Runs -= 5; // Wicket penalty  
+            currentMatch.Runs -= 5; // Wicket penalty  
         }
 
         if (isFirstInnings)
@@ -271,7 +261,7 @@ public partial class ScoringPage : ContentPage
             WicketDim.IsVisible = false;
 
             UpdateScoreDisplay();
-            
+
             // If the wicket was the last ball of the over, we need to hold the EndOver pop up until the dismissal is confirmed
             if (pendingEndOver)
             {
@@ -698,29 +688,23 @@ public partial class ScoringPage : ContentPage
         currentMatch.CurrentOver = currentOver;
         await MatchSaver.SaveMatchState(currentMatch);
 
+        // Don't end the match early if it's the second innings
         if (!isFirstInnings)
         {
-            int target = currentMatch.TeamAScore + 1;
-
-            if (currentMatch.Runs >= target && !matchEnded)
+            // If all overs have been bowled, end the game
+            if (currentMatch.OversDetails.Count >= currentMatch.TotalOvers)
             {
-                matchEnded = true;
-                currentMatch.TeamBScore = currentMatch.Runs;
+                await EndGame();
+            }
+            else
+            {
+                // Optionally update a "current status" label
+                int target = currentMatch.TeamAScore;
+                int diff = currentMatch.Runs - target;
 
-                // Fix: Ensure last over is added, even if incomplete
-                if (currentOver.Deliveries.Count > 0)
-                {
-                    currentMatch.OversDetails.Add(currentOver);
-                }
-
-                currentMatch.SecondInningsOvers = currentMatch.OversDetails.ToList();
-                await DisplayAlert("Match Won", $"{currentMatch.TeamB} has won the match!", "OK");
-
-                bool endNow = await DisplayAlert("End Match?", "Would you like to end the match now?", "Yes", "No");
-                if (endNow)
-                {
-                    await EndGame();
-                }
+                TargetLabel.Text = diff > 0
+                    ? $"{currentMatch.TeamB} is currently ahead by {diff} runs"
+                    : $"{currentMatch.TeamB} needs {-diff + 1} more to win";
             }
         }
     }
@@ -766,9 +750,9 @@ public partial class ScoringPage : ContentPage
             // Both innings complete
             currentMatch.CurrentOver = currentOver;
             MatchResult result = MatchConverter.BuildMatchResult(currentMatch);
-            
+
             await MatchSaver.SaveMatchResultAsync(result);
-            
+
             await Navigation.PushAsync(new SummaryPage(result));
         }
         catch (Exception ex)

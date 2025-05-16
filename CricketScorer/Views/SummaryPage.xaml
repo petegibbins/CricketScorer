@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CricketScorer.Views.SummaryPage"
-             Title="SummaryPage">
+             Title="SummaryPage"
+             BackgroundColor="White">
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="16">
 
@@ -103,7 +104,8 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <Button Text="Share Match Summary" Clicked="OnShareSummaryClicked" HorizontalOptions="Center" Margin="0,20,0,0" />    
+            <Button Text="Share Match Summary" Clicked="OnShareSummaryClicked" HorizontalOptions="Center" Margin="0,20,0,0" />
+            <Button Text="Back to Home" Clicked="OnBackHomeClicked" HorizontalOptions="Center" Margin="0,20,0,0" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

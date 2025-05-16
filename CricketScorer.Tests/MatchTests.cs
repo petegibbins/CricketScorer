@@ -6,38 +6,87 @@ namespace CricketScorer.Tests
     [TestClass]
     public sealed class MatchTests
     {
+
+        [TestMethod]
+        public void TeamBCanPassTargetButStillLoseDueToWickets()
+        {
+            var match = new Match
+            {
+                TeamAScore = 50,
+                TeamBScore = 0,
+                TotalOvers = 2,
+                Format = Match.MatchFormat.Standard,
+                OversDetails = new List<Over>
+        {
+            new Over
+            {
+                Deliveries = new List<Ball>
+                {
+                    new Ball { Runs = 51 }, // massive hit
+                    new Ball { Runs = 0, IsWicket = true }, // -5 penalty
+                    new Ball { Runs = 0, IsWicket = true },
+                    new Ball { Runs = 0 },
+                    new Ball { Runs = 0 },
+                    new Ball { Runs = 0 }
+                }
+            },
+            new Over
+            {
+                Deliveries = new List<Ball>
+                {
+                    new Ball { Runs = 0 },
+                    new Ball { Runs = 0 },
+                    new Ball { Runs = 0, IsWicket = true }, // more penalties
+                    new Ball { Runs = 0 },
+                    new Ball { Runs = 0 },
+                    new Ball { Runs = 0 }
+                }
+            }
+        },
+                IsFirstInnings = false
+            };
+
+            match.Runs = match.OversDetails
+                .SelectMany(o => o.Deliveries)
+                .Sum(b => b.Runs) - match.OversDetails
+                .SelectMany(o => o.Deliveries)
+                .Count(b => b.IsWicket) * 5;
+
+            Assert.IsTrue(match.Runs < match.TeamAScore, "Despite passing the score initially, Team B lost due to penalties.");
+        }
+
         [TestMethod]
         public void SummariseBowling_AcrossMultiplePairs_ComputesCorrectly()
         {
             var overs = new List<Over>
-    {
-        new Over
-        {
-            Bowler = "Zoe",
-            Batter1 = "Alice",
-            Batter2 = "Beth",
-            Deliveries = new List<Ball>
             {
-                new Ball { Runs = 1 },
-                new Ball { Runs = 0, IsWicket = true, DismissalType = "Caught" }, // counts
-                new Ball { Runs = 2 },
-                new Ball { Runs = 0 }
-            }
-        },
-        new Over
-        {
-            Bowler = "Zoe",
-            Batter1 = "Carol",
-            Batter2 = "Diana",
-            Deliveries = new List<Ball>
-            {
-                new Ball { Runs = 0, IsWicket = true, DismissalType = "Run Out" }, // NOT counted
-                new Ball { Runs = 1, IsWide = true },
-                new Ball { Runs = 4 },
-                new Ball { Runs = 0, IsWicket = true, DismissalType = "Bowled" }  // counts
-            }
-        }
-    };
+                new Over
+                {
+                    Bowler = "Zoe",
+                    Batter1 = "Alice",
+                    Batter2 = "Beth",
+                    Deliveries = new List<Ball>
+                    {
+                        new Ball { Runs = 1 },
+                        new Ball { Runs = 0, IsWicket = true, DismissalType = "Caught" }, // counts
+                        new Ball { Runs = 2 },
+                        new Ball { Runs = 0 }
+                    }
+                },
+                new Over
+                {
+                    Bowler = "Zoe",
+                    Batter1 = "Carol",
+                    Batter2 = "Diana",
+                    Deliveries = new List<Ball>
+                    {
+                        new Ball { Runs = 0, IsWicket = true, DismissalType = "Run Out" }, // NOT counted
+                        new Ball { Runs = 1, IsWide = true },
+                        new Ball { Runs = 4 },
+                        new Ball { Runs = 0, IsWicket = true, DismissalType = "Bowled" }  // counts
+                    }
+                }
+            };
 
             var match = new Match
             {

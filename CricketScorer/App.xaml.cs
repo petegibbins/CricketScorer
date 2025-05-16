@@ -10,5 +10,11 @@ namespace CricketScorer
 
             MainPage = new NavigationPage(new HomePage());
         }
+
+        protected override void OnStart()
+        {
+            // Handle when your app starts
+            App.Current.UserAppTheme = AppTheme.Light;
+        }
     }
 }

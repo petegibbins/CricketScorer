@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CricketScorer.Views.TeamSetupPage"
-             Title="TeamSetupPage">
+             Title="TeamSetupPage"
+             BackgroundColor="White">
     <VerticalStackLayout Padding="20" Spacing="15">
 
         <Label Text="Team Name" FontSize="20" />

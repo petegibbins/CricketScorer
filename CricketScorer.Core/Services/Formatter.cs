@@ -34,5 +34,28 @@ namespace CricketScorer.Core.Services
 
             return sb.ToString();
         }
+
+        public string FormatTargetLabel(Match currentMatch)
+        {
+
+            int target = currentMatch.TeamAScore + 1;
+            int diff = currentMatch.Runs - target;
+
+            if (diff < -1)
+            {
+                return $"Needs {-diff} more to win";
+            }
+            else if (diff == -1)
+            {
+                return "Scores level!";
+            }
+            else if (diff >= 0)
+            {
+                return $"{currentMatch.TeamB} is currently ahead by {diff + 1} run{(diff + 1 == 1 ? "" : "s")}.";
+            }
+            return string.Empty;
+        }
+
+
     }
 }

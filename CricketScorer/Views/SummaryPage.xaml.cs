@@ -47,4 +47,9 @@ public partial class SummaryPage : ContentPage
             await DisplayAlert("Error", "No match summary found to share.", "OK");
         }
     }
+
+    private async void OnBackHomeClicked(object sender, EventArgs e)
+    {
+        await Navigation.PopToRootAsync(); // Navigate back to the home page
+    }
 }
