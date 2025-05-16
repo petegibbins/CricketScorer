@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CricketScorer", "CricketScorer\CricketScorer.csproj", "{2C46CE39-A2ED-45E8-B523-821D62F23FC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CricketScorerTest", "CricketScorerTest\CricketScorerTest.csproj", "{D7BD3EE0-4657-4CFD-8CFD-519982CE88B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CricketScorer.Core", "CricketScorer.Core\CricketScorer.Core.csproj", "{4E80E33E-A75B-4022-8629-B2AE11E87406}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +21,14 @@ Global
 		{2C46CE39-A2ED-45E8-B523-821D62F23FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C46CE39-A2ED-45E8-B523-821D62F23FC5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C46CE39-A2ED-45E8-B523-821D62F23FC5}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{D7BD3EE0-4657-4CFD-8CFD-519982CE88B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7BD3EE0-4657-4CFD-8CFD-519982CE88B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7BD3EE0-4657-4CFD-8CFD-519982CE88B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7BD3EE0-4657-4CFD-8CFD-519982CE88B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E80E33E-A75B-4022-8629-B2AE11E87406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E80E33E-A75B-4022-8629-B2AE11E87406}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E80E33E-A75B-4022-8629-B2AE11E87406}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E80E33E-A75B-4022-8629-B2AE11E87406}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
