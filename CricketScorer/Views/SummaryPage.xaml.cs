@@ -27,7 +27,7 @@ public partial class SummaryPage : ContentPage
     }
     public string FormatSummaryText()
     {
-        Formatter formatter = new Formatter();
+        Formatter formatter = new();
         return formatter.FormatSummaryText(result);
     }
     private async void OnShareSummaryClicked(object sender, EventArgs e)
