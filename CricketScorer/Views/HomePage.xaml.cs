@@ -63,7 +63,7 @@ namespace CricketScorer.Views
         private async void OnPlayerSetUpClicked(object sender, EventArgs e)
         {
             var match = new Match();
-            await Navigation.PushAsync(new TeamSetupPage(match, true)); // Start with Team A
+            await Navigation.PushAsync(new TeamSetupPage(match)); // Start with Team A
         }
 
         private async void OnStartDemoMatchClicked(object sender, EventArgs e)
@@ -294,6 +294,11 @@ namespace CricketScorer.Views
         private async void OnViewSavedMatchesClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new FilesViewPage());
+        }
+
+        private async void OnNewMatchClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new NewMatchPage(new Match()));
         }
     }
 

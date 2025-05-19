@@ -9,13 +9,17 @@ namespace CricketScorer.Views
         private readonly bool isTeamA;
         private ObservableCollection<string> players = new();
 
-        public TeamSetupPage(Match match, bool isTeamA)
+        public TeamSetupPage(Match match)
         {
             InitializeComponent();
             this.match = match;
-            this.isTeamA = isTeamA;
 
-            Title = isTeamA ? match.TeamA + " setup" : match.TeamB + " setup";
+            Title = "Teams setup";
+        }
+
+        private async void OnAddPlayersClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new PlayerSetupPage(match)); // or pass relevant context
         }
 
         private void OnAddPlayerClicked(object sender, EventArgs e)
@@ -31,26 +35,10 @@ namespace CricketScorer.Views
 
         private async void OnNextClicked(object sender, EventArgs e)
         {
-            string? teamName = TeamNameEntry.Text?.Trim();
+            string? teamAName = TeamANameEntry.Text?.Trim();
+            string? teamBName = TeamBNameEntry.Text?.Trim();
 
-            if (string.IsNullOrWhiteSpace(teamName) || players.Count < 2)
-            {
-                await DisplayAlert("Missing Info", "Please enter a team name and at least 2 players.", "OK");
-                return;
-            }
 
-            if (isTeamA)
-            {
-                match.TeamA = teamName;
-                match.TeamAPlayers = players.ToList();
-                await Navigation.PushAsync(new TeamSetupPage(match, false)); // Move to Team B
-            }
-            else
-            {
-                match.TeamB = teamName;
-                match.TeamBPlayers = players.ToList();
-                await Navigation.PushAsync(new NewMatchPage(match)); // Ready for match settings
-            }
         }
     }
 }

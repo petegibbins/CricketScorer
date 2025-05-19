@@ -30,7 +30,7 @@ public partial class NewMatchPage : ContentPage
         currentMatch.Format = FormatPicker.SelectedIndex == 1 ? Match.MatchFormat.Hundred : Match.MatchFormat.Standard;
         currentMatch.TotalOvers = overs;
 
-        await Navigation.PushAsync(new ScoringPage(currentMatch));
+        await Navigation.PushAsync(new PlayerSetupPage(currentMatch));
     }
 
     private void OnFormatChanged(object sender, EventArgs e)

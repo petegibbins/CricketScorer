@@ -51,6 +51,11 @@ namespace CricketScorer.Core.Models
         public int StartingRuns { get; set; } = 200;
 
         public int BallsPerOver => Format == MatchFormat.Hundred ? 5 : 6;
+
+        public List<PairOverride> PairOverrides { get; set; } = new();
+
+        public List<string> TeamARoster { get; set; } = new();
+        public List<string> TeamBRoster { get; set; } = new();
         public enum MatchFormat
         {
             Standard, // 6-ball overs

@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CricketScorer.Views.PlayerSetupPage"
-             Title="Player Setup"
-             BackgroundColor="White">
+             x:Class="CricketScorer.PlayerSetupPage"
+             Title="Add Players">
 
-    <VerticalStackLayout Padding="20" Spacing="15">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-            <Label Text="Enter Batter Names" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label x:Name="TeamALabel" Text="Team A Players" FontAttributes="Bold" FontSize="18" />
+            <VerticalStackLayout x:Name="TeamAPlayersStack" Spacing="10" />
+            <Button Text="Add Player to Team A" Clicked="OnAddTeamAPlayerClicked" />
 
-            <Entry x:Name="PlayerNameEntry" Placeholder="Enter player name..." />
+            <Label x:Name="TeamBLabel"  Text="Team B Players" FontAttributes="Bold" FontSize="18" />
+            <VerticalStackLayout x:Name="TeamBPlayersStack" Spacing="10" />
+            <Button Text="Add Player to Team B" Clicked="OnAddTeamBPlayerClicked" />
 
-            <Button Text="Add Player" Clicked="OnAddPlayerClicked" />
-
-            <CollectionView x:Name="PlayersCollectionView" HeightRequest="300">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Label Text="{Binding}" FontSize="18" />
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-
-            <Button Text="Start Match" BackgroundColor="Green" TextColor="White" Clicked="OnStartMatchClicked" />
+            <Button Text="Start Match"
+                    Clicked="OnStartMatchClicked"
+                    Margin="0,30,0,0" />
 
         </VerticalStackLayout>
-
-    </ContentPage>
+    </ScrollView>
+</ContentPage>

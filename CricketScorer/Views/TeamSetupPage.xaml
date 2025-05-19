@@ -7,7 +7,9 @@
     <VerticalStackLayout Padding="20" Spacing="15">
 
         <Label Text="Team Name" FontSize="20" />
-        <Entry x:Name="TeamNameEntry" Placeholder="Enter team name..." />
+        <Entry x:Name="TeamANameEntry" Placeholder="Enter team name..." />
+        <Entry x:Name="TeamBNameEntry" Placeholder="Enter team name..." />
+        <Button Text="Add Players (optional)" Clicked="OnAddPlayersClicked" Margin="0,20,0,0" />
 
         <Label Text="Enter Batters" FontSize="20" />
         <Entry x:Name="PlayerNameEntry" Placeholder="Enter player name..." />

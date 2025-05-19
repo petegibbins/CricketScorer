@@ -1,7 +1,8 @@
-using System.Diagnostics;
-using CricketScorer.Helpers;
-using CricketScorer.Core.Models;
+ï»¿using CricketScorer.Core.Models;
 using CricketScorer.Core.Services;
+using CricketScorer.Helpers;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace CricketScorer.Views;
 
@@ -17,7 +18,7 @@ public partial class ScoringPage : ContentPage
     private List<string> availableBowlers = new();
     private bool isSelectingBowler = false;
     private bool pendingEndOver = false; // Flag to check if end over is pending so we can show the popup again if needed
-
+    private ObservableCollection<string> bowlerNames = new();
 
     public ScoringPage(Match match)
     {
@@ -56,6 +57,7 @@ public partial class ScoringPage : ContentPage
         {
             isFirstInnings = false;
         }
+
         currentOver.IsFirstInning = isFirstInnings;
 
         ScoreLabel.Text = $"Score: {currentMatch.Runs}/{currentMatch.Wickets}";
@@ -63,13 +65,29 @@ public partial class ScoringPage : ContentPage
         BattingTeamLabel.Text = isFirstInnings ? currentMatch.TeamA : currentMatch.TeamB;
 
         var overs = currentMatch.OversDetails.ToList();
-        var batters = isFirstInnings ? currentMatch.TeamAPlayers : currentMatch.TeamBPlayers;
+        var teamPlayers = isFirstInnings ? currentMatch.TeamARoster : currentMatch.TeamBRoster;
 
-        // NEW: Update batting pair label
-        if (batters.Count >= (currentMatch.CurrentPairIndex * 2 + 2))
+        // âœ… NEW: Use override if one exists
+        string batter1 = "???";
+        string batter2 = "???";
+        int pairIndex = currentMatch.CurrentPairIndex;
+
+        if (teamPlayers.Count >= (pairIndex * 2 + 2))
         {
-            string batter1 = batters[currentMatch.CurrentPairIndex * 2];
-            string batter2 = batters[currentMatch.CurrentPairIndex * 2 + 1];
+            var pairOverride = currentMatch.PairOverrides
+                .FirstOrDefault(p => p.PairIndex == pairIndex);
+
+            if (pairOverride != null)
+            {
+                batter1 = pairOverride.Batter1;
+                batter2 = pairOverride.Batter2;
+            }
+            else
+            {
+                batter1 = teamPlayers[pairIndex * 2];
+                batter2 = teamPlayers[pairIndex * 2 + 1];
+            }
+
             BattingPairLabel.Text = $"{batter1} & {batter2}";
         }
         else
@@ -86,7 +104,8 @@ public partial class ScoringPage : ContentPage
         {
             TargetLabel.Text = string.Empty;
         }
-            LastOversLabel.FormattedText = BuildFormattedLastOversString();
+
+        LastOversLabel.FormattedText = BuildFormattedLastOversString();
         UpdateRequiredRunRate();
     }
 
@@ -337,14 +356,16 @@ public partial class ScoringPage : ContentPage
 
     private void ShowBattingPairPopup()
     {
-        var batters = currentMatch.IsFirstInnings
-            ? currentMatch.TeamAPlayers
-            : currentMatch.TeamBPlayers;
 
+        var allBatters = isFirstInnings ? currentMatch.TeamARoster : currentMatch.TeamBRoster;
 
-        BattingPairList.ItemsSource = batters
+        var batters = allBatters
+            .Distinct()
             .Select(name => new BatterItem { Name = name, IsSelected = false })
             .ToList();
+
+        BattingPairList.ItemsSource = batters;
+        ConfirmBattingPairButton.IsEnabled = false;
 
         BattingPairPopup.IsVisible = true;
         BattingPairDim.IsVisible = true;
@@ -361,8 +382,10 @@ public partial class ScoringPage : ContentPage
 
     private void OnConfirmBattingPair(object sender, EventArgs e)
     {
-        var items = BattingPairList.ItemsSource as List<BatterItem>;
-        var selected = items.Where(x => x.IsSelected).ToList();
+        var selected = (BattingPairList.ItemsSource as List<BatterItem>)
+                        ?.Where(x => x.IsSelected)
+                        .Select(x => x.Name)
+                        .ToList();
 
         if (selected.Count != 2)
         {
@@ -370,20 +393,71 @@ public partial class ScoringPage : ContentPage
             return;
         }
 
-        currentOver.Batter1 = selected[0].Name;
-        currentOver.Batter2 = selected[1].Name;
+        // Store override instead of overwriting TeamAPlayers
+        var existing = currentMatch.PairOverrides.FirstOrDefault(p => p.PairIndex == currentMatch.CurrentPairIndex);
+        if (existing != null)
+        {
+            existing.Batter1 = selected[0];
+            existing.Batter2 = selected[1];
+        }
+        else
+        {
+            currentMatch.PairOverrides.Add(new PairOverride
+            {
+                PairIndex = currentMatch.CurrentPairIndex,
+                Batter1 = selected[0],
+                Batter2 = selected[1]
+            });
+        }
 
         BattingPairPopup.IsVisible = false;
         BattingPairDim.IsVisible = false;
 
+        var teamList = isFirstInnings ? currentMatch.TeamAPlayers : currentMatch.TeamBPlayers;
+
+        int i1 = currentMatch.CurrentPairIndex * 2;
+        int i2 = i1 + 1;
+
+        // Make sure the list is long enough
+        while (teamList.Count <= i2)
+        {
+            teamList.Add("Unknown");
+        }
+
+        teamList[i1] = selected[0];
+        teamList[i2] = selected[1];
+        currentOver.Batter1 = selected[0];
+        currentOver.Batter2 = selected[1];
+
         UpdateBattingPairDisplay();
 
         Debug.WriteLine($"Updated batters: {currentOver.Batter1} & {currentOver.Batter2}");
+        Debug.WriteLine("Current batting list:");
+    }
+
+
+    private async void OnBattingPairLabelTapped(object sender, TappedEventArgs e)
+    {
+        // Load the batting options into the popup (if needed)
+        ShowBattingPairPopup(); // or however you're loading this
+
+        BattingPairPopup.IsVisible = true;
+        BattingPairDim.IsVisible = true;
     }
 
     private void OnBatterTapped(object sender, TappedEventArgs e)
     {
-        if (sender is Frame frame && frame.BindingContext is BatterItem item)
+        Frame frame = null;
+
+        if (sender is Frame f)
+        {
+            frame = f;
+        }
+        else if (sender is VisualElement ve && ve.Parent is Frame pf)
+        {
+            frame = pf;
+        }
+        if (frame?.BindingContext is BatterItem item)
         {
             var list = (BattingPairList.ItemsSource as List<BatterItem>);
             if (item.IsSelected)
@@ -399,13 +473,14 @@ public partial class ScoringPage : ContentPage
                 DisplayAlert("Limit", "You can only select 2 batters.", "OK");
             }
 
-            // Refresh UI — MAUI doesn’t auto-update bindings in list
             BattingPairList.ItemsSource = null;
             BattingPairList.ItemsSource = list;
 
             ConfirmBattingPairButton.IsEnabled = list.Count(x => x.IsSelected) == 2;
         }
+
     }
+
 
     private void UpdateBattingPairDisplay()
     {
@@ -425,15 +500,28 @@ public partial class ScoringPage : ContentPage
 
         try
         {
-            List<string> bowlers = isFirstInnings ? currentMatch.TeamBPlayers : currentMatch.TeamAPlayers; // Bowling team is the fielding side
+            var source = isFirstInnings ? currentMatch.TeamBRoster : currentMatch.TeamARoster;
+
+            bowlerNames.Clear();
+            foreach (var name in source)
+                bowlerNames.Add(name);
+
+            BowlerList.ItemsSource = bowlerNames;
+
+
+            List<string> bowlers = isFirstInnings ? currentMatch.TeamBRoster : currentMatch.TeamARoster; // Bowling team is the fielding side
             if (bowlers.Count == 0)
             {
-                await DisplayAlert("No Bowlers", "No bowlers available!", "OK");
+                string name = await DisplayPromptAsync("Bowler's Name", "Enter name of the bowler:");
+                if (!bowlerNames.Contains(name, StringComparer.OrdinalIgnoreCase))
+                {
+                    bowlerNames.Add(name);
+                    source.Add(name);
+                    await PlayerNameService.AddAsync(name);
+                }
                 return;
             }
 
-            BowlerList.ItemsSource = null;
-            BowlerList.ItemsSource = bowlers;
 
             BowlerPopup.Opacity = 0;
             BowlerPopup.IsVisible = true;
@@ -466,6 +554,34 @@ public partial class ScoringPage : ContentPage
     }
 
 
+    private void OnAddNewBowlerClicked(object sender, EventArgs e)
+    {
+        if (!NewBowlerEntry.IsVisible)
+        {
+            NewBowlerEntry.Text = string.Empty;
+            NewBowlerEntry.IsVisible = true;
+            NewBowlerEntry.Focus();
+            AddNewBowlerButton.Text = "Confirm Add";
+        }
+        else
+        {
+            var name = NewBowlerEntry.Text?.Trim();
+            if (!string.IsNullOrWhiteSpace(name) && !bowlerNames.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                bowlerNames.Add(name);
+                BowlerList.ItemsSource = null;
+                BowlerList.ItemsSource = bowlerNames;
+
+                NewBowlerEntry.IsVisible = false;
+                AddNewBowlerButton.Text = "Add New Bowler";
+                NewBowlerEntry.Text = string.Empty;
+
+                // Optional: auto-select newly added
+                currentMatch.CurrentBowler = name;
+                currentMatch.OverBowlers.Add(currentMatch.CurrentBowler);
+            }
+        }
+    }
 
     private void OnBowlerSelected(object sender, SelectionChangedEventArgs e)
     {
@@ -672,6 +788,7 @@ public partial class ScoringPage : ContentPage
             await DisplayAlert("New Innings", $"{currentMatch.TeamB} now batting to chase {currentMatch.TeamAScore} runs!", "OK");
             await SelectNextBowler();
             UpdateScoreDisplay();
+            UpdateBattingPairDisplay();
         }
         else
         {

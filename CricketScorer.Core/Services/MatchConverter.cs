@@ -15,7 +15,10 @@ public static class MatchConverter
 
         // First innings: Team A bats
         result.TeamAInnings = match.FirstInningsOvers;
-        result.TeamABattingPairs = GroupBattingPairs(match.TeamAPlayers, match.FirstInningsOvers);
+        
+        result.TeamABattingPairs = GroupBattingPairs(match.FirstInningsOvers);
+
+        //result.TeamABattingPairs = GroupBattingPairs(match.TeamAPlayers, match.FirstInningsOvers);
         result.TeamABowlingStats = SummariseBowling(match.SecondInningsOvers);
         result.TeamABattingRuns = TotalBattingRuns(match.FirstInningsOvers);
         result.TeamAExtras = TotalExtras(match.FirstInningsOvers);
@@ -24,7 +27,8 @@ public static class MatchConverter
 
         // Second innings: Team B bats
         result.TeamBInnings = match.SecondInningsOvers;
-        result.TeamBBattingPairs = GroupBattingPairs(match.TeamBPlayers, match.SecondInningsOvers);
+        result.TeamBBattingPairs = GroupBattingPairs(match.SecondInningsOvers);
+        //result.TeamBBattingPairs = GroupBattingPairs(match.TeamBPlayers, match.SecondInningsOvers);
         result.TeamBBowlingStats = SummariseBowling(match.FirstInningsOvers);
         result.TeamBBattingRuns = TotalBattingRuns(match.SecondInningsOvers);
         result.TeamBExtras = TotalExtras(match.SecondInningsOvers);
@@ -43,23 +47,7 @@ public static class MatchConverter
         return result;
     }
 
-    private static int TotalBattingRuns(List<Over> overs)
-    {
-        return overs
-            .SelectMany(o => o.Deliveries)
-            .Where(b => !b.IsWide && !b.IsNoBall)
-            .Sum(b => b.Runs);
-    }
-
-    private static int TotalExtras(List<Over> overs)
-    {
-        return overs
-            .SelectMany(o => o.Deliveries)
-            .Where(b => b.IsWide || b.IsNoBall)
-            .Sum(b => b.Runs);
-    }
-
-    private static List<PairStat> GroupBattingPairs(List<string> players, List<Over> overs)
+    private static List<PairStat> GroupBattingPairs(List<Over> overs)
     {
         var grouped = overs
             .GroupBy(o => $"{o.Batter1} & {o.Batter2}")
@@ -78,6 +66,22 @@ public static class MatchConverter
             .ToList();
 
         return grouped;
+    }
+
+    private static int TotalBattingRuns(List<Over> overs)
+    {
+        return overs
+            .SelectMany(o => o.Deliveries)
+            .Where(b => !b.IsWide && !b.IsNoBall)
+            .Sum(b => b.Runs);
+    }
+
+    private static int TotalExtras(List<Over> overs)
+    {
+        return overs
+            .SelectMany(o => o.Deliveries)
+            .Where(b => b.IsWide || b.IsNoBall)
+            .Sum(b => b.Runs);
     }
 
     private static List<BowlerStat> SummariseBowling(List<Over> overs)
