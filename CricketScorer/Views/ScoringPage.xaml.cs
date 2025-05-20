@@ -12,7 +12,6 @@ public partial class ScoringPage : ContentPage
     private Match currentMatch;
     private int ballsInCurrentOver = 0;
     private Over currentOver = new Over();
-    private bool isFirstInnings = true;
     private bool matchEnded = false;
     private bool showBowlerPopup;
     private List<string> availableBowlers = new();
@@ -53,20 +52,17 @@ public partial class ScoringPage : ContentPage
 
     private void UpdateScoreDisplay()
     {
-        if (currentMatch.IsFirstInningsComplete)
-        {
-            isFirstInnings = false;
-        }
-
-        currentOver.IsFirstInning = isFirstInnings;
 
         ScoreLabel.Text = $"Score: {currentMatch.Runs}/{currentMatch.Wickets}";
+        Debug.WriteLine($"!!! Score label text: {ScoreLabel.Text}");
         OverLabel.Text = $"Overs: {currentMatch.OversDetails.Count}/{currentMatch.TotalOvers}";
-        BattingTeamLabel.Text = isFirstInnings ? currentMatch.TeamA : currentMatch.TeamB;
+        Debug.WriteLine($"!!! Over label text: {OverLabel.Text}");
+        BattingTeamLabel.Text = currentMatch.IsFirstInnings ? currentMatch.TeamA : currentMatch.TeamB;
+        Debug.WriteLine($"!!! Batting label = {BattingTeamLabel.Text}");
 
         var overs = currentMatch.OversDetails.ToList();
-        var teamPlayers = isFirstInnings ? currentMatch.TeamARoster : currentMatch.TeamBRoster;
-
+        var teamPlayers = currentMatch.IsFirstInnings ? currentMatch.TeamARoster : currentMatch.TeamBRoster;
+        Debug.WriteLine($"!!! Is first innings? {currentMatch.IsFirstInnings.ToString()}");
         // ✅ NEW: Use override if one exists
         string batter1 = "???";
         string batter2 = "???";
@@ -74,7 +70,7 @@ public partial class ScoringPage : ContentPage
 
         if (teamPlayers.Count >= (pairIndex * 2 + 2))
         {
-            var pairOverride = currentMatch.PairOverrides
+            var pairOverride = currentMatch.GetActivePairOverrides()
                 .FirstOrDefault(p => p.PairIndex == pairIndex);
 
             if (pairOverride != null)
@@ -95,7 +91,7 @@ public partial class ScoringPage : ContentPage
             BattingPairLabel.Text = "No Active Batters";
         }
 
-        if (!isFirstInnings)
+        if (!currentMatch.IsFirstInnings)
         {
             var formatter = new Formatter();
             TargetLabel.Text = formatter.FormatTargetLabel(currentMatch);
@@ -104,7 +100,10 @@ public partial class ScoringPage : ContentPage
         {
             TargetLabel.Text = string.Empty;
         }
+        currentOver.Batter1 = batter1;
+        currentOver.Batter2 = batter2;
 
+        Debug.WriteLine($"!!! Current Batters: {currentOver.Batter1} & {currentOver.Batter2}");
         LastOversLabel.FormattedText = BuildFormattedLastOversString();
         UpdateRequiredRunRate();
     }
@@ -168,7 +167,7 @@ public partial class ScoringPage : ContentPage
             int ballsBowled = currentMatch.OversDetails.Sum(o => o.Deliveries.Count);
             int ballsRemaining = currentMatch.TotalOvers * currentMatch.BallsPerOver - ballsBowled;
 
-            if (ballsRemaining > (double)currentMatch.BallsPerOver)
+            if (ballsRemaining > currentMatch.BallsPerOver)
             {
                 double requiredRate = runsRemaining / (ballsRemaining / (double)currentMatch.BallsPerOver);
                 RequiredRunRateLabel.Text = $"Required Run Rate: {requiredRate:0.00}";
@@ -176,8 +175,8 @@ public partial class ScoringPage : ContentPage
             }
             else
             {
-                RequiredRunRateLabel.Text = "Innings Complete";
-                RequiredRunRateLabel.IsVisible = true;
+                RequiredRunRateLabel.Text = $"{runsRemaining} runs required";
+                RequiredRunRateLabel.IsVisible = false;
             }
         }
         else
@@ -196,7 +195,7 @@ public partial class ScoringPage : ContentPage
             currentMatch.Runs -= 5; // Wicket penalty  
         }
 
-        if (isFirstInnings)
+        if (currentMatch.IsFirstInnings)
         {
             currentMatch.TeamAScore = currentMatch.Runs;
         }
@@ -206,7 +205,7 @@ public partial class ScoringPage : ContentPage
         }
         ballsInCurrentOver++;
         currentOver.Deliveries.Add(ball);
-        currentOver.IsFirstInning = isFirstInnings;
+        currentOver.IsFirstInning = currentMatch.IsFirstInnings;
 
         CheckForMatchWin();
         CheckOverComplete();
@@ -323,7 +322,7 @@ public partial class ScoringPage : ContentPage
         {
             currentMatch.OversDetails.Add(currentOver);
             currentMatch.OverBowlers.Add(currentMatch.CurrentBowler);
-            currentOver = new Over(); // Start a fresh over
+            currentOver = new Over(); // New over
         }
 
         ballsInCurrentOver = 0;
@@ -339,16 +338,18 @@ public partial class ScoringPage : ContentPage
             }
         }
 
-        // NEW: Check if time to swap batting pair
         int oversBowled = currentMatch.OversDetails.Count;
-        if (oversBowled % currentMatch.OversPerPair == 0)
+        var pairList = currentMatch.GetActivePairOverrides();
+
+        if (currentMatch.OversPerPair >= 1 &&
+            pairList.Count > 0 &&
+            oversBowled % currentMatch.OversPerPair == 0)
         {
-            bool swap = await DisplayAlert("Swap Batting Pair", "Swap to next batting pair now?", "Yes", "No");
-            if (swap)
-            {
-                currentMatch.CurrentPairIndex++;
-                UpdateScoreDisplay(); // Refresh new batters
-            }
+            currentMatch.CurrentPairIndex = (currentMatch.CurrentPairIndex + 1) % pairList.Count;
+
+            var currentPair = pairList[currentMatch.CurrentPairIndex];
+            await DisplayAlert("Batting Pair Changed", $"New pair: {currentPair.Batter1} and {currentPair.Batter2}", "OK");
+            UpdateScoreDisplay();
         }
 
         await SelectNextBowler();
@@ -357,7 +358,7 @@ public partial class ScoringPage : ContentPage
     private void ShowBattingPairPopup()
     {
 
-        var allBatters = isFirstInnings ? currentMatch.TeamARoster : currentMatch.TeamBRoster;
+        var allBatters = currentMatch.IsFirstInnings ? currentMatch.TeamARoster : currentMatch.TeamBRoster;
 
         var batters = allBatters
             .Distinct()
@@ -394,7 +395,7 @@ public partial class ScoringPage : ContentPage
         }
 
         // Store override instead of overwriting TeamAPlayers
-        var existing = currentMatch.PairOverrides.FirstOrDefault(p => p.PairIndex == currentMatch.CurrentPairIndex);
+        var existing = currentMatch.GetActivePairOverrides().FirstOrDefault(p => p.PairIndex == currentMatch.CurrentPairIndex);
         if (existing != null)
         {
             existing.Batter1 = selected[0];
@@ -402,7 +403,7 @@ public partial class ScoringPage : ContentPage
         }
         else
         {
-            currentMatch.PairOverrides.Add(new PairOverride
+            currentMatch.GetActivePairOverrides().Add(new PairOverride
             {
                 PairIndex = currentMatch.CurrentPairIndex,
                 Batter1 = selected[0],
@@ -413,7 +414,7 @@ public partial class ScoringPage : ContentPage
         BattingPairPopup.IsVisible = false;
         BattingPairDim.IsVisible = false;
 
-        var teamList = isFirstInnings ? currentMatch.TeamAPlayers : currentMatch.TeamBPlayers;
+        var teamList = currentMatch.IsFirstInnings ? currentMatch.TeamAPlayers : currentMatch.TeamBPlayers;
 
         int i1 = currentMatch.CurrentPairIndex * 2;
         int i2 = i1 + 1;
@@ -500,7 +501,7 @@ public partial class ScoringPage : ContentPage
 
         try
         {
-            var source = isFirstInnings ? currentMatch.TeamBRoster : currentMatch.TeamARoster;
+            var source = currentMatch.IsFirstInnings ? currentMatch.TeamBRoster : currentMatch.TeamARoster;
 
             bowlerNames.Clear();
             foreach (var name in source)
@@ -509,7 +510,7 @@ public partial class ScoringPage : ContentPage
             BowlerList.ItemsSource = bowlerNames;
 
 
-            List<string> bowlers = isFirstInnings ? currentMatch.TeamBRoster : currentMatch.TeamARoster; // Bowling team is the fielding side
+            List<string> bowlers = currentMatch.IsFirstInnings ? currentMatch.TeamBRoster : currentMatch.TeamARoster; // Bowling team is the fielding side
             if (bowlers.Count == 0)
             {
                 string name = await DisplayPromptAsync("Bowler's Name", "Enter name of the bowler:");
@@ -537,10 +538,10 @@ public partial class ScoringPage : ContentPage
             ScrollFadeOverlay.IsVisible = bowlers.Count > 5;
 
             // Set the batters for this over
-            var batters = isFirstInnings ? currentMatch.TeamAPlayers : currentMatch.TeamBPlayers;
+            var batters = currentMatch.IsFirstInnings ? currentMatch.TeamAPlayers : currentMatch.TeamBPlayers;
             currentOver.Batter1 = batters[currentMatch.CurrentPairIndex * 2];
             currentOver.Batter2 = batters[currentMatch.CurrentPairIndex * 2 + 1];
-            currentOver.IsFirstInning = isFirstInnings;
+            currentOver.IsFirstInning = currentMatch.IsFirstInnings;
 
         }
         catch (Exception ex)
@@ -765,9 +766,10 @@ public partial class ScoringPage : ContentPage
             currentOver = new Over();
         }
 
-        if (isFirstInnings)
+        if (currentMatch.IsFirstInnings)
         {
-            isFirstInnings = false;
+            currentMatch.IsFirstInnings = false;
+            currentMatch.CurrentPairIndex = 0;
             currentMatch.IsFirstInningsComplete = true;
             currentMatch.TeamAScore = currentMatch.Runs;
             currentMatch.TeamAWickets = currentMatch.Wickets;
@@ -806,7 +808,7 @@ public partial class ScoringPage : ContentPage
         await MatchSaver.SaveMatchState(currentMatch);
 
         // Don't end the match early if it's the second innings
-        if (!isFirstInnings)
+        if (!currentMatch.IsFirstInnings)
         {
             // If all overs have been bowled, end the game
             if (currentMatch.OversDetails.Count >= currentMatch.TotalOvers)
@@ -815,13 +817,9 @@ public partial class ScoringPage : ContentPage
             }
             else
             {
-                // Optionally update a "current status" label
-                int target = currentMatch.TeamAScore;
-                int diff = currentMatch.Runs - target;
-
-                TargetLabel.Text = diff > 0
-                    ? $"{currentMatch.TeamB} is currently ahead by {diff} runs"
-                    : $"{currentMatch.TeamB} needs {-diff + 1} more to win";
+                // Update the target label
+                var formatter = new Formatter();
+                TargetLabel.Text = formatter.FormatTargetLabel(currentMatch);
             }
         }
     }

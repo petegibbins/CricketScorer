@@ -29,6 +29,8 @@ public partial class NewMatchPage : ContentPage
         currentMatch.Runs = startingRuns;
         currentMatch.Format = FormatPicker.SelectedIndex == 1 ? Match.MatchFormat.Hundred : Match.MatchFormat.Standard;
         currentMatch.TotalOvers = overs;
+        int oversPerPair = (int)OversPerPairPicker.SelectedItem;
+        currentMatch.OversPerPair = oversPerPair;
 
         await Navigation.PushAsync(new PlayerSetupPage(currentMatch));
     }

@@ -43,7 +43,7 @@ namespace CricketScorer.Core.Services
 
             if (diff < -1)
             {
-                return $"Needs {-diff} more to win";
+                return $"{currentMatch.TeamB} requires {-diff} more";
             }
             else if (diff == -1)
             {

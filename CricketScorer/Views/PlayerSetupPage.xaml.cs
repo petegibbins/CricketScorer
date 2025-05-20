@@ -2,16 +2,17 @@
 using CricketScorer.Core.Services;
 using CricketScorer.Helpers;
 using CricketScorer.Views;
+using System.Text.RegularExpressions;
 
 namespace CricketScorer;
 
 public partial class PlayerSetupPage : ContentPage
 {
-    private Match _match;
+    private Core.Models.Match _match;
     private List<Entry> _teamAEntries = new();
     private List<Entry> _teamBEntries = new();
 
-    public PlayerSetupPage(Match match)
+    public PlayerSetupPage(Core.Models.Match match)
     {
         InitializeComponent();
         _match = match;
@@ -168,6 +169,26 @@ public partial class PlayerSetupPage : ContentPage
 
         _match.TeamARoster = _match.TeamAPlayers.ToList();
         _match.TeamBRoster = _match.TeamBPlayers.ToList();
+
+        // Generate Team A pairs
+        _match.TeamAPairOverrides = new List<PairOverride>();
+        for (int i = 0; i < _match.TeamARoster.Count; i += 2)
+        {
+            var b1 = _match.TeamARoster[i];
+            var b2 = (i + 1 < _match.TeamARoster.Count) ? _match.TeamARoster[i + 1] : "No Partner";
+            _match.TeamAPairOverrides.Add(new PairOverride { Batter1 = b1, Batter2 = b2 });
+        }
+
+        // Generate Team B pairs
+        _match.TeamBPairOverrides = new List<PairOverride>();
+        for (int i = 0; i < _match.TeamBRoster.Count; i += 2)
+        {
+            var b1 = _match.TeamBRoster[i];
+            var b2 = (i + 1 < _match.TeamBRoster.Count) ? _match.TeamBRoster[i + 1] : "No Partner";
+            _match.TeamBPairOverrides.Add(new PairOverride { Batter1 = b1, Batter2 = b2 });
+        }
+
+
 
         // Save players for autocomplete
         foreach (var name in _match.TeamAPlayers.Concat(_match.TeamBPlayers))

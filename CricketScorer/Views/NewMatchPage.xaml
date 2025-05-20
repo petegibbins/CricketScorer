@@ -19,6 +19,17 @@
         </Picker>
 
         <Entry x:Name="OversEntry" Placeholder="Enter Number of Overs" Keyboard="Numeric" />
+        <Label Text="Overs per Batting Pair" />
+        <Picker x:Name="OversPerPairPicker" Title="Select Overs Per Pair">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:Int32}">
+                    <x:Int32>1</x:Int32>
+                    <x:Int32>2</x:Int32>
+                    <x:Int32>3</x:Int32>
+                    <x:Int32>4</x:Int32>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
         <Entry x:Name="RunsEntry" Placeholder="Enter Starting Runs" Text="200" Keyboard="Numeric" />
 
         <Button Text="Continue" Clicked="OnStartScoringClicked"  Pressed="OnButtonPressed" Released="OnButtonReleased"/>

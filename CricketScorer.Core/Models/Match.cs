@@ -26,7 +26,7 @@ namespace CricketScorer.Core.Models
         public int TeamAScore { get; set; }
         public int TeamBScore { get; set; }
 
-        public bool IsFirstInningsComplete { get; set; }
+        public bool IsFirstInningsComplete { get; set; } = false;
         public bool IsFirstInnings { get; set; } = true; // Start with Team A batting first
 
         // Track who bowled each over
@@ -52,7 +52,13 @@ namespace CricketScorer.Core.Models
 
         public int BallsPerOver => Format == MatchFormat.Hundred ? 5 : 6;
 
-        public List<PairOverride> PairOverrides { get; set; } = new();
+        public List<PairOverride> TeamAPairOverrides { get; set; } = new();
+        public List<PairOverride> TeamBPairOverrides { get; set; } = new();
+
+        public List<PairOverride> GetActivePairOverrides()
+        {
+            return IsFirstInnings ? TeamAPairOverrides : TeamBPairOverrides;
+        }
 
         public List<string> TeamARoster { get; set; } = new();
         public List<string> TeamBRoster { get; set; } = new();
