@@ -24,6 +24,7 @@ public static class MatchConverter
         result.TeamAExtras = TotalExtras(match.FirstInningsOvers);
         int teamAWickets = match.FirstInningsOvers.SelectMany(o => o.Deliveries).Count(b => b.IsWicket);
         result.TeamAScore = result.TeamABattingRuns + result.TeamAExtras - (teamAWickets * 5);
+        result.TeamAWickets = teamAWickets; 
 
         // Second innings: Team B bats
         result.TeamBInnings = match.SecondInningsOvers;
@@ -34,6 +35,7 @@ public static class MatchConverter
         result.TeamBExtras = TotalExtras(match.SecondInningsOvers);
         int teamBWickets = match.SecondInningsOvers.SelectMany(o => o.Deliveries).Count(b => b.IsWicket);
         result.TeamBScore = result.TeamBBattingRuns + result.TeamBExtras - (teamBWickets * 5);
+        result.TeamBWickets = teamBWickets; 
 
         // All pair stats flat list
         result.BattingPairs = result.TeamABattingPairs.Concat(result.TeamBBattingPairs).ToList();
@@ -100,8 +102,7 @@ public static class MatchConverter
                                                 (b.DismissalType == "Bowled" ||
                                                  b.DismissalType == "Caught" ||
                                                  b.DismissalType == "LBW" ||
-                                                 b.DismissalType == "Stumped" ||
-                                                 b.DismissalType == "Hit Wicket")),
+                                                 b.DismissalType == "Stumped")),
                     ExtrasConceded = deliveries.Where(b => b.IsWide || b.IsNoBall).Sum(b => b.Runs)
                 };
             })

@@ -106,6 +106,7 @@
             </CollectionView>
             <Button Text="Share Match Summary" Clicked="OnShareSummaryClicked" HorizontalOptions="Center" Margin="0,20,0,0" />
             <Button Text="Back to Home" Clicked="OnBackHomeClicked" HorizontalOptions="Center" Margin="0,20,0,0" />
+            <Button Text="View Full Scorecard" Clicked="OnViewScorecardClicked" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

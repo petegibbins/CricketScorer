@@ -8,6 +8,9 @@ namespace CricketScorer.Core.Models
 {
     public class MatchResult
     {
+        public int TeamAWickets;
+        public int TeamBWickets;
+
         public string TeamA { get; set; }
         public string TeamB { get; set; }
         public int TeamAScore { get; set; }

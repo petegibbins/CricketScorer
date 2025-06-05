@@ -24,7 +24,7 @@ namespace CricketScorer.Tests
             };
 
             var result = _summaryService.FormatTargetLabel(match);
-            Assert.AreEqual("Needs 6 more to win", result);
+            Assert.AreEqual("Opposition requires 6 more", result);
         }
 
         [TestMethod]

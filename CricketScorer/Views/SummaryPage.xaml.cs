@@ -16,12 +16,12 @@ public partial class SummaryPage : ContentPage
         ScoreSummaryLabel.Text = $"{matchResult.TeamA}: {matchResult.TeamAScore}  {matchResult.TeamB}: {matchResult.TeamBScore}";
 
         TeamAHeader.Text = $"{matchResult.TeamA} Summary";
-        TeamAScoreLabel.Text = $"Score: {matchResult.TeamAScore} (Batting {matchResult.TeamABattingRuns}, Extras {matchResult.TeamAExtras})";
+        TeamAScoreLabel.Text = $"Score: {matchResult.TeamAScore}/{matchResult.TeamBWickets} (Batting {matchResult.TeamABattingRuns}, Extras {matchResult.TeamAExtras})";
         TeamAPairStatsList.ItemsSource = matchResult.TeamABattingPairs;
         TeamABowlerStatsList.ItemsSource = matchResult.TeamBBowlingStats.OrderBy(x=>x.Bowler); // Team B bowled to Team A
 
         TeamBHeader.Text = $"{matchResult.TeamB} Summary";
-        TeamBScoreLabel.Text = $"Score: {matchResult.TeamBScore} (Batting {matchResult.TeamBBattingRuns}, Extras {matchResult.TeamBExtras})";
+        TeamBScoreLabel.Text = $"Score: {matchResult.TeamBScore}/{matchResult.TeamAWickets} (Batting {matchResult.TeamBBattingRuns}, Extras {matchResult.TeamBExtras})";
         TeamBPairStatsList.ItemsSource = matchResult.TeamBBattingPairs;
         TeamBBowlerStatsList.ItemsSource = matchResult.TeamABowlingStats.OrderBy(x => x.Bowler); // Team A bowled to Team B
     }
@@ -51,5 +51,18 @@ public partial class SummaryPage : ContentPage
     private async void OnBackHomeClicked(object sender, EventArgs e)
     {
         await Navigation.PopToRootAsync(); // Navigate back to the home page
+    }
+    public async Task ShowFullScorecard(MatchResult result)
+    {
+        var html = HtmlScorecardService.GenerateHtml(result);
+        var path = Path.Combine(FileSystem.CacheDirectory, "scorecard.html");
+        File.WriteAllText(path, html);
+
+        await Navigation.PushAsync(new ScorecardWebViewPage(path));
+    }
+
+    private async void OnViewScorecardClicked(object sender, EventArgs e)
+    {
+        await ShowFullScorecard(result); // your current match result
     }
 }

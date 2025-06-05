@@ -8,6 +8,45 @@ namespace CricketScorer.Tests
     {
 
         [TestMethod]
+        public void WicketsSummary_CorrectlyDistinguishesBowlerAndTotalWickets()
+        {
+            // Arrange
+            var match = new Match
+            {
+                TeamA = "Tuddenham",
+                TeamB = "Opposition",
+                FirstInningsOvers = new List<Over>
+        {
+            new Over
+            {
+                Bowler = "Zoe",
+                Batter1 = "Alice",
+                Batter2 = "Beth",
+                Deliveries = new List<Ball>
+                {
+                    new Ball { Runs = 0, IsWicket = true, DismissalType = "Bowled" },   // credited
+                    new Ball { Runs = 0, IsWicket = true, DismissalType = "Stumped" },  // credited
+                    new Ball { Runs = 0, IsWicket = true, DismissalType = "Caught" },   // credited
+                    new Ball { Runs = 0, IsWicket = true, DismissalType = "Run Out" },   // NOT credited
+                    new Ball { Runs = 0, IsWicket = true, DismissalType = "Hit Wicket" }   // NOT credited
+                }
+            }
+        }
+            };
+
+            var result = MatchConverter.BuildMatchResult(match);
+
+            // Act
+            var bowlingStat = result.TeamBBowlingStats.FirstOrDefault(b => b.Bowler == "Zoe");
+
+            // Assert
+            Assert.AreEqual(5, result.TeamAWickets, "All dismissals count towards total wickets lost.");
+            Assert.IsNotNull(bowlingStat, "Zoe should appear in bowling stats.");
+            Assert.AreEqual(3, bowlingStat.Wickets, "Only Bowled, stumped and Caught count for the bowler.");
+        }
+
+
+        [TestMethod]
         public void TeamBCanPassTargetButStillLoseDueToWickets()
         {
             var match = new Match

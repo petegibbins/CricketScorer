@@ -91,6 +91,9 @@
 	  <MauiXaml Update="Views\PlayerSetupPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\ScorecardWebViewPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\ScoringPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
