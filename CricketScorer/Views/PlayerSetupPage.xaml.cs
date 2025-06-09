@@ -68,17 +68,10 @@ public partial class PlayerSetupPage : ContentPage
         var downButton = new Button { Text = "⬇", FontSize = 20, WidthRequest = 50 };
         var removeButton = new Button { Text = "❌", TextColor = Colors.Red, FontSize = 20, WidthRequest = 50 };
 
-        var buttonRow = new HorizontalStackLayout
+        var container = new HorizontalStackLayout
         {
             Spacing = 10,
-            Children = { upButton, downButton, removeButton },
-            HorizontalOptions = LayoutOptions.Center
-        };
-
-        var container = new VerticalStackLayout
-        {
-            Spacing = 4,
-            Children = { entry, buttonRow },
+            Children = { entry, upButton, downButton, removeButton },
             Padding = new Thickness(0, 5)
         };
 
@@ -132,13 +125,13 @@ public partial class PlayerSetupPage : ContentPage
         for (int i = 0; i < entryList.Count; i++)
         {
             var entry = entryList[i];
-            var container = stack.Children[i] as Layout;
-            var buttons = (container as VerticalStackLayout)?.Children[1] as HorizontalStackLayout;
+            var container = stack.Children[i] as HorizontalStackLayout;
+            if (container == null || container.Children.Count < 4) continue;
 
-            if (buttons == null || buttons.Children.Count < 3) continue;
+            var upButton = container.Children[1] as Button;
+            var downButton = container.Children[2] as Button;
 
-            var upButton = buttons.Children[0] as Button;
-            var downButton = buttons.Children[1] as Button;
+            if (upButton == null || downButton == null) continue;
 
             upButton.IsEnabled = i != 0;
             downButton.IsEnabled = i != entryList.Count - 1;
