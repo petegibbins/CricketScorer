@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CricketScorer.Views.ScoringPage"
              xmlns:local="clr-namespace:CricketScorer.Helpers"
-             Title="ScoringPage">
+             Title="ScoringPage"
+             BackgroundColor="White">
     <ContentPage.Resources>
         <ResourceDictionary>
             <local:BoolToColorConverter x:Key="BoolToColorConverter" />

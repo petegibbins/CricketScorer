@@ -17,6 +17,7 @@ namespace CricketScorer.WinUI
         public App()
         {
             this.InitializeComponent();
+            Microsoft.Maui.Controls.Application.Current.UserAppTheme = AppTheme.Light;
         }
 
         protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();

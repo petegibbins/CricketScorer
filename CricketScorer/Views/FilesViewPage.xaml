@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CricketScorer.Views.FilesViewPage"
-             Title="FilesViewPage">
+             Title="FilesViewPage"
+             BackgroundColor="White">
     <StackLayout Padding="10">
         <Label Text="Saved Files" FontAttributes="Bold" FontSize="18" />
         <CollectionView x:Name="FileListView" SelectionMode="Single" SelectionChanged="OnFileSelected">
