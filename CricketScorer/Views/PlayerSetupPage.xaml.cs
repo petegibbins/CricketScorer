@@ -3,6 +3,7 @@ using CricketScorer.Core.Services;
 using CricketScorer.Helpers;
 using CricketScorer.Views;
 using System.Text.RegularExpressions;
+using Microsoft.Maui.Graphics;
 
 namespace CricketScorer;
 
@@ -64,15 +65,40 @@ public partial class PlayerSetupPage : ContentPage
             HorizontalOptions = LayoutOptions.FillAndExpand
         };
 
-        var upButton = new Button { Text = "⬆", FontSize = 20, WidthRequest = 50 };
-        var downButton = new Button { Text = "⬇", FontSize = 20, WidthRequest = 50 };
-        var removeButton = new Button { Text = "❌", TextColor = Colors.Red, FontSize = 20, WidthRequest = 50 };
+        var upButton = new Button
+        {
+            Text = "⬆",
+            FontSize = 16,
+            WidthRequest = 40,
+            BackgroundColor = Color.FromArgb("#4CAF50"),
+            TextColor = Colors.White,
+            CornerRadius = 6
+        };
+        var downButton = new Button
+        {
+            Text = "⬇",
+            FontSize = 16,
+            WidthRequest = 40,
+            BackgroundColor = Color.FromArgb("#2196F3"),
+            TextColor = Colors.White,
+            CornerRadius = 6
+        };
+        var removeButton = new Button
+        {
+            Text = "❌",
+            FontSize = 16,
+            WidthRequest = 40,
+            BackgroundColor = Color.FromArgb("#F44336"),
+            TextColor = Colors.White,
+            CornerRadius = 6
+        };
 
         var container = new HorizontalStackLayout
         {
-            Spacing = 10,
-            Children = { entry, upButton, downButton, removeButton },
-            Padding = new Thickness(0, 5)
+            Spacing = 5,
+            Padding = new Thickness(0, 5),
+            HorizontalOptions = LayoutOptions.FillAndExpand,
+            Children = { entry, upButton, downButton, removeButton }
         };
 
         // Button actions
