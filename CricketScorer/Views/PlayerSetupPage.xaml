@@ -6,14 +6,14 @@
              BackgroundColor="White">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <VerticalStackLayout Padding="20" Spacing="20" HorizontalOptions="FillAndExpand">
 
             <Label x:Name="TeamALabel" Text="Team A Players" FontAttributes="Bold" FontSize="18" />
-            <VerticalStackLayout x:Name="TeamAPlayersStack" Spacing="10" />
+            <VerticalStackLayout x:Name="TeamAPlayersStack" Spacing="10" HorizontalOptions="FillAndExpand" />
             <Button Text="Add Player to Team A" Clicked="OnAddTeamAPlayerClicked" />
 
             <Label x:Name="TeamBLabel"  Text="Team B Players" FontAttributes="Bold" FontSize="18" />
-            <VerticalStackLayout x:Name="TeamBPlayersStack" Spacing="10" />
+            <VerticalStackLayout x:Name="TeamBPlayersStack" Spacing="10" HorizontalOptions="FillAndExpand" />
             <Button Text="Add Player to Team B" Clicked="OnAddTeamBPlayerClicked" />
 
             <Button Text="Start Match"
