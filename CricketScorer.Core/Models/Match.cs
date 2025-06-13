@@ -62,6 +62,8 @@ namespace CricketScorer.Core.Models
 
         public List<string> TeamARoster { get; set; } = new();
         public List<string> TeamBRoster { get; set; } = new();
+        public string BattingFirst { get; set; }
+
         public enum MatchFormat
         {
             Standard, // 6-ball overs

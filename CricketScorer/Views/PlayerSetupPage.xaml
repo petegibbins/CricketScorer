@@ -6,20 +6,28 @@
              BackgroundColor="White">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20" HorizontalOptions="FillAndExpand">
+        <Grid Padding="20" RowSpacing="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <Label x:Name="TeamALabel" Text="Team A Players" FontAttributes="Bold" FontSize="18" />
-            <VerticalStackLayout x:Name="TeamAPlayersStack" Spacing="10" HorizontalOptions="FillAndExpand" />
-            <Button Text="Add Player to Team A" Clicked="OnAddTeamAPlayerClicked" />
+            <Label x:Name="TeamALabel" Text="Team A Players" FontAttributes="Bold" FontSize="18" Grid.Row="0" />
+            <VerticalStackLayout x:Name="TeamAPlayersStack" Spacing="10" Grid.Row="1" />
+            <Button Text="Add Player to Team A" Clicked="OnAddTeamAPlayerClicked" Grid.Row="2" />
 
-            <Label x:Name="TeamBLabel"  Text="Team B Players" FontAttributes="Bold" FontSize="18" />
-            <VerticalStackLayout x:Name="TeamBPlayersStack" Spacing="10" HorizontalOptions="FillAndExpand" />
-            <Button Text="Add Player to Team B" Clicked="OnAddTeamBPlayerClicked" />
+            <Label x:Name="TeamBLabel" Text="Team B Players" FontAttributes="Bold" FontSize="18" Grid.Row="3" />
+            <VerticalStackLayout x:Name="TeamBPlayersStack" Spacing="10" Grid.Row="4" />
+            <Button Text="Add Player to Team B" Clicked="OnAddTeamBPlayerClicked" Grid.Row="5" />
 
-            <Button Text="Start Match"
-                    Clicked="OnStartMatchClicked"
-                    Margin="0,30,0,0" />
-
-        </VerticalStackLayout>
+            <Button Text="Start Match Team A batting" Clicked="OnStartMatchTeamAFirstClicked" Margin="0,30,0,0" Grid.Row="6" />
+            <Button Text="Start Match Team B batting" Clicked="OnStartMatchTeamBFirstClicked" Margin="0,5,0,0" Grid.Row="7" />
+        </Grid>
     </ScrollView>
 </ContentPage>

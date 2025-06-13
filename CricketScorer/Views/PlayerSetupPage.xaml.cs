@@ -62,7 +62,7 @@ public partial class PlayerSetupPage : ContentPage
             Placeholder = $"Player {entryList.Count + 1}",
             FontSize = 18,
             Text = initialValue,
-            HorizontalOptions = LayoutOptions.FillAndExpand
+            HorizontalOptions = LayoutOptions.Center
         };
 
         var upButton = new Button
@@ -174,7 +174,17 @@ public partial class PlayerSetupPage : ContentPage
         AddPlayerField(TeamBPlayersStack, _teamBEntries);
     }
 
-    private async void OnStartMatchClicked(object sender, EventArgs e)
+    private async void OnStartMatchTeamAFirstClicked(object sender, EventArgs e)
+    {
+        await StartMatchAsync(battingFirst: "A");
+    }
+
+    private async void OnStartMatchTeamBFirstClicked(object sender, EventArgs e)
+    {
+        await StartMatchAsync(battingFirst: "B");
+    }
+
+    private async Task StartMatchAsync(string battingFirst)
     {
         _match.TeamAPlayers = _teamAEntries
             .Select(e => e.Text?.Trim())
@@ -207,12 +217,32 @@ public partial class PlayerSetupPage : ContentPage
             _match.TeamBPairOverrides.Add(new PairOverride { Batter1 = b1, Batter2 = b2 });
         }
 
-
-
         // Save players for autocomplete
         foreach (var name in _match.TeamAPlayers.Concat(_match.TeamBPlayers))
         {
             await PlayerNameService.AddAsync(name);
+        }
+
+        // Set batting order
+        _match.BattingFirst = battingFirst == "A" ? _match.TeamA : _match.TeamB;
+        if (battingFirst == "B")
+        {
+            // Swap teams if B is batting first
+            var tempTeam = _match.TeamA;
+            var tempPlayers = _match.TeamAPlayers;
+            var tempRoster = _match.TeamARoster;
+            var tempPairOverrides = _match.TeamAPairOverrides;
+            
+            _match.TeamA = _match.TeamB;
+            _match.TeamAPlayers = _match.TeamBPlayers;
+            _match.TeamARoster = _match.TeamBRoster;
+            _match.TeamAPairOverrides = _match.TeamBPairOverrides;
+
+            _match.TeamB = tempTeam;
+            _match.TeamBPlayers = tempPlayers;
+            _match.TeamBRoster = tempRoster;
+            _match.TeamBPairOverrides = tempPairOverrides;
+          
         }
 
         await Navigation.PushAsync(new ScoringPage(_match));
