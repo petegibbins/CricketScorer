@@ -22,12 +22,92 @@ public partial class PlayerSetupPage : ContentPage
         PrefillPlayerFields(_match.TeamBPlayers, TeamBPlayersStack, _teamBEntries);
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
         TeamALabel.Text = _match.TeamA;
         TeamBLabel.Text = _match.TeamB;
+
+        await ReloadTeamPickers();
     }
+
+    private async void OnTeamAPickerChanged(object sender, EventArgs e)
+    {
+        if (TeamAPicker.SelectedItem is string selectedTeamName)
+        {
+            var team = await TeamService.GetTeamByNameAsync(selectedTeamName);
+            if (team != null)
+            {
+                _match.TeamA = team.TeamName;
+                _teamAEntries.Clear(); // Clear old fields
+                TeamAPlayersStack.Children.Clear();
+                PrefillPlayerFields(team.Players, TeamAPlayersStack, _teamAEntries);
+                TeamALabel.Text = team.TeamName;
+            }
+        }
+    }
+
+    private async void OnTeamBPickerChanged(object sender, EventArgs e)
+    {
+        if (TeamBPicker.SelectedItem is string selectedTeamName)
+        {
+            var team = await TeamService.GetTeamByNameAsync(selectedTeamName);
+            if (team != null)
+            {
+                _match.TeamB = team.TeamName;
+                _teamBEntries.Clear(); // Clear old fields
+                TeamBPlayersStack.Children.Clear();
+                PrefillPlayerFields(team.Players, TeamBPlayersStack, _teamBEntries);
+                TeamBLabel.Text = team.TeamName;
+            }
+        }
+    }
+
+    private async void OnSaveTeamAClicked(object sender, EventArgs e)
+    {
+        string teamName = await DisplayPromptAsync("Save Team A", "Enter a name for this team:");
+        if (!string.IsNullOrWhiteSpace(teamName))
+        {
+            var team = new SavedTeam
+            {
+                TeamName = teamName,
+                Players = _teamAEntries
+                    .Select(e => e.Text?.Trim())
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
+                    .ToList()
+            };
+            await TeamService.SaveTeamAsync(team);
+            await ReloadTeamPickers();
+            TeamALabel.Text = team.TeamName;
+        }
+    }
+
+    private async void OnSaveTeamBClicked(object sender, EventArgs e)
+    {
+        string teamName = await DisplayPromptAsync("Save Team B", "Enter a name for this team:");
+        if (!string.IsNullOrWhiteSpace(teamName))
+        {
+            var team = new SavedTeam
+            {
+                TeamName = teamName,
+                Players = _teamBEntries
+                    .Select(e => e.Text?.Trim())
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
+                    .ToList()
+            };
+            await TeamService.SaveTeamAsync(team);
+            await ReloadTeamPickers();
+            TeamBLabel.Text = team.TeamName;
+        }
+    }
+
+    private async Task ReloadTeamPickers()
+    {
+        var teams = await TeamService.GetAllTeamsAsync();
+        TeamAPicker.ItemsSource = teams.Select(t => t.TeamName).ToList();
+        TeamBPicker.ItemsSource = teams.Select(t => t.TeamName).ToList();
+    }
+
 
     private void GeneratePlayerFields(Layout stack, List<Entry> entryList)
     {
@@ -62,44 +142,63 @@ public partial class PlayerSetupPage : ContentPage
             Placeholder = $"Player {entryList.Count + 1}",
             FontSize = 18,
             Text = initialValue,
-            HorizontalOptions = LayoutOptions.Center
+            Margin = new Thickness(0, 0, 10, 0)
         };
 
         var upButton = new Button
         {
             Text = "⬆",
-            FontSize = 16,
-            WidthRequest = 40,
+            FontSize = 18,
+            WidthRequest = 44,
+            HeightRequest = 44,
             BackgroundColor = Color.FromArgb("#4CAF50"),
             TextColor = Colors.White,
-            CornerRadius = 6
+            CornerRadius = 6,
+            Padding = new Thickness(0)
         };
+
         var downButton = new Button
         {
             Text = "⬇",
-            FontSize = 16,
-            WidthRequest = 40,
+            FontSize = 18,
+            WidthRequest = 44,
+            HeightRequest = 44,
             BackgroundColor = Color.FromArgb("#2196F3"),
             TextColor = Colors.White,
-            CornerRadius = 6
+            CornerRadius = 6,
+            Padding = new Thickness(0)
         };
+
         var removeButton = new Button
         {
             Text = "❌",
-            FontSize = 16,
-            WidthRequest = 40,
-            BackgroundColor = Color.FromArgb("#F44336"),
+            FontSize = 18,
+            WidthRequest = 44,
+            HeightRequest = 44,
+            BackgroundColor = Color.FromArgb("#ffffff"),
             TextColor = Colors.White,
-            CornerRadius = 6
+            CornerRadius = 6,
+            Padding = new Thickness(0)
         };
 
-        var container = new HorizontalStackLayout
+        var buttonStack = new HorizontalStackLayout
         {
             Spacing = 5,
-            Padding = new Thickness(0, 5),
-            HorizontalOptions = LayoutOptions.FillAndExpand,
-            Children = { entry, upButton, downButton, removeButton }
+            Children = { upButton, downButton, removeButton }
         };
+
+        var rowGrid = new Grid
+        {
+            ColumnSpacing = 10,
+            ColumnDefinitions =
+        {
+            new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+            new ColumnDefinition { Width = GridLength.Auto }
+        }
+        };
+
+        rowGrid.Add(entry, 0, 0);
+        rowGrid.Add(buttonStack, 1, 0);
 
         // Button actions
         upButton.Clicked += (s, e) =>
@@ -110,8 +209,8 @@ public partial class PlayerSetupPage : ContentPage
                 entryList.RemoveAt(index);
                 entryList.Insert(index - 1, entry);
 
-                stack.Children.Remove(container);
-                stack.Children.Insert(index - 1, container);
+                stack.Children.Remove(rowGrid);
+                stack.Children.Insert(index - 1, rowGrid);
 
                 UpdateReorderButtonStates(stack, entryList);
             }
@@ -125,8 +224,8 @@ public partial class PlayerSetupPage : ContentPage
                 entryList.RemoveAt(index);
                 entryList.Insert(index + 1, entry);
 
-                stack.Children.Remove(container);
-                stack.Children.Insert(index + 1, container);
+                stack.Children.Remove(rowGrid);
+                stack.Children.Insert(index + 1, rowGrid);
 
                 UpdateReorderButtonStates(stack, entryList);
             }
@@ -135,32 +234,45 @@ public partial class PlayerSetupPage : ContentPage
         removeButton.Clicked += (s, e) =>
         {
             entryList.Remove(entry);
-            stack.Children.Remove(container);
+            stack.Children.Remove(rowGrid);
             UpdateReorderButtonStates(stack, entryList);
         };
 
         entryList.Add(entry);
-        stack.Children.Add(container);
+        stack.Children.Add(rowGrid);
 
-        // Ensure correct button state
         UpdateReorderButtonStates(stack, entryList);
     }
+
 
     private void UpdateReorderButtonStates(Layout stack, List<Entry> entryList)
     {
         for (int i = 0; i < entryList.Count; i++)
         {
             var entry = entryList[i];
-            var container = stack.Children[i] as HorizontalStackLayout;
-            if (container == null || container.Children.Count < 4) continue;
+            var container = stack.Children[i] as Grid;
+            if (container == null || container.ColumnDefinitions.Count < 2) continue;
 
-            var upButton = container.Children[1] as Button;
-            var downButton = container.Children[2] as Button;
+            var buttonStack = container.Children[1] as HorizontalStackLayout;
+            if (buttonStack == null || buttonStack.Children.Count < 3) continue;
 
-            if (upButton == null || downButton == null) continue;
+            var upButton = buttonStack.Children[0] as Button;
+            var downButton = buttonStack.Children[1] as Button;
 
-            upButton.IsEnabled = i != 0;
-            downButton.IsEnabled = i != entryList.Count - 1;
+            bool isFirst = i == 0;
+            bool isLast = i == entryList.Count - 1;
+
+            if (upButton != null)
+            {
+                upButton.IsEnabled = !isFirst;
+                upButton.BackgroundColor = isFirst ? Colors.LightGray : Color.FromArgb("#4CAF50");
+            }
+
+            if (downButton != null)
+            {
+                downButton.IsEnabled = !isLast;
+                downButton.BackgroundColor = isLast ? Colors.LightGray : Color.FromArgb("#2196F3");
+            }
         }
     }
 

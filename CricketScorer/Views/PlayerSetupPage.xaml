@@ -16,18 +16,55 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Label x:Name="TeamALabel" Text="Team A Players" FontAttributes="Bold" FontSize="18" Grid.Row="0" />
-            <VerticalStackLayout x:Name="TeamAPlayersStack" Spacing="10" Grid.Row="1" />
-            <Button Text="Add Player to Team A" Clicked="OnAddTeamAPlayerClicked" Grid.Row="2" />
 
-            <Label x:Name="TeamBLabel" Text="Team B Players" FontAttributes="Bold" FontSize="18" Grid.Row="3" />
-            <VerticalStackLayout x:Name="TeamBPlayersStack" Spacing="10" Grid.Row="4" />
-            <Button Text="Add Player to Team B" Clicked="OnAddTeamBPlayerClicked" Grid.Row="5" />
+            <!-- Team A -->
+            <Label Text="Select Team A" FontAttributes="Bold" Grid.Row="0" />
+            <Picker x:Name="TeamAPicker" Title="Choose Team A" SelectedIndexChanged="OnTeamAPickerChanged" Grid.Row="1" />
 
-            <Button Text="Start Match Team A batting" Clicked="OnStartMatchTeamAFirstClicked" Margin="0,30,0,0" Grid.Row="6" />
-            <Button Text="Start Match Team B batting" Clicked="OnStartMatchTeamBFirstClicked" Margin="0,5,0,0" Grid.Row="7" />
+            <Label x:Name="TeamALabel" Text="Team A Players" FontAttributes="Bold" FontSize="18" Grid.Row="2" />
+            <VerticalStackLayout x:Name="TeamAPlayersStack" Spacing="10" Grid.Row="3" />
+
+            <Grid Grid.Row="4" ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Text="Add Player to Team A" Clicked="OnAddTeamAPlayerClicked" BackgroundColor="#2196F3" TextColor="White" Grid.Column="0" />
+                <Button Text="Save Team A" Clicked="OnSaveTeamAClicked" BackgroundColor="#009688" TextColor="White" Grid.Column="1" />
+                <Button Text="Bat First" Clicked="OnStartMatchTeamAFirstClicked" BackgroundColor="#D32F2F" Grid.Column="2" />
+            </Grid>
+
+            <!-- Team B -->
+            <Label Text="Select Team B" FontAttributes="Bold" Grid.Row="5" />
+            <Picker x:Name="TeamBPicker" Title="Choose Team B" SelectedIndexChanged="OnTeamBPickerChanged" Grid.Row="6" />
+
+            <Label x:Name="TeamBLabel" Text="Team B Players" FontAttributes="Bold" FontSize="18" Grid.Row="7" />
+
+            <VerticalStackLayout x:Name="TeamBPlayersStack" Spacing="10" Grid.Row="8" />
+            <!--<Button Text="Add Player to Team B" Clicked="OnAddTeamBPlayerClicked" Grid.Row="9" />-->
+            <Grid Grid.Row="9" ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Text="Add Player to Team B" Clicked="OnAddTeamBPlayerClicked" BackgroundColor="#2196F3" TextColor="White" Grid.Column="0" />
+                <Button Text="Save Team B" Clicked="OnSaveTeamBClicked" BackgroundColor="#009688" TextColor="White" Grid.Column="1" />
+                <Button Text="Bat First" Clicked="OnStartMatchTeamBFirstClicked" BackgroundColor="#D32F2F" Grid.Column="2" />
+            </Grid>
+
         </Grid>
     </ScrollView>
 </ContentPage>
+

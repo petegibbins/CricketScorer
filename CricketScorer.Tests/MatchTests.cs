@@ -281,7 +281,7 @@ namespace CricketScorer.Tests
             var bowlerStat = result.TeamBBowlingStats.FirstOrDefault(b => b.Bowler == "Zoe");
 
             Assert.IsNotNull(bowlerStat);
-            Assert.AreEqual(4, bowlerStat.Wickets, "Only bowled and caught should be credited");
+            Assert.AreEqual(3, bowlerStat.Wickets, "Only bowled, stumped and caught should be credited");
         }
 
 

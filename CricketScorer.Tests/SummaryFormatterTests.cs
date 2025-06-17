@@ -22,11 +22,11 @@ namespace CricketScorer.Tests
                 TeamAScore = 90,
                 TeamABattingRuns = 80,
                 TeamAExtras = 10,
-                TeamAWickets = 3,
+                TeamAWickets = 5,
                 TeamBScore = 80,
                 TeamBBattingRuns = 72,
                 TeamBExtras = 8,
-                TeamBWickets = 5,
+                TeamBWickets = 3,
                 TeamABowlingStats = new List<BowlerStat>
                 {
                     new BowlerStat { Bowler = "Alice", RunsConceded = 20, Wickets = 2, ExtrasConceded = 2 },
@@ -74,8 +74,8 @@ namespace CricketScorer.Tests
             Assert.AreEqual(1, result.TeamBWickets, "TeamBWickets don't tally");      // 1 credited dismissal
 
             // Final: Validate the output contains derived values
-            StringAssert.Contains(summary, "Tuddenham Score: -2/1 (Batting: 7, Extras: 1)");
-            StringAssert.Contains(summary, "Old Newton Score: 6/2 (Batting: 10, Extras: 1)");
+            StringAssert.Contains(summary, "Tuddenham Score: -2/2 (Batting: 7, Extras: 1)");
+            StringAssert.Contains(summary, "Old Newton Score: 6/1 (Batting: 10, Extras: 1)");
         }
 
         private Match CreateSampleMatch()

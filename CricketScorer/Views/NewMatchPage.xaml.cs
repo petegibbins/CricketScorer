@@ -11,20 +11,23 @@ public partial class NewMatchPage : ContentPage
     {
         InitializeComponent();
         currentMatch = match;
-        // Use currentMatch in the page as needed
-        TeamAEntry.Text = currentMatch.TeamA;
-        TeamBEntry.Text = currentMatch.TeamB;
     }
 
     private async void OnStartScoringClicked(object sender, EventArgs e)
     {
-        string teamA = TeamAEntry.Text?.Trim();
-        string teamB = TeamBEntry.Text?.Trim();
+
         int overs = int.TryParse(OversEntry.Text, out var o) ? o : 0;
+
+        // Validate Overs
+        if (overs <= 0)
+        {
+            await DisplayAlert("Invalid Input", "Please enter a valid number of overs greater than 0.", "OK");
+            return;
+        }
+
+
         int startingRuns = int.TryParse(RunsEntry.Text, out var r) ? r : 200;
 
-        currentMatch.TeamA = teamA;
-        currentMatch.TeamB = teamB;
         currentMatch.StartingRuns = startingRuns;
         currentMatch.Runs = startingRuns;
         currentMatch.Format = FormatPicker.SelectedIndex == 1 ? Match.MatchFormat.Hundred : Match.MatchFormat.Standard;

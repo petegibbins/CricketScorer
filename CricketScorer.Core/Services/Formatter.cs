@@ -16,8 +16,8 @@ namespace CricketScorer.Core.Services
             sb.AppendLine($"Date: {result.DatePlayed:dd MMM yyyy}");
             sb.AppendLine(result.ResultText);
             sb.AppendLine();
-            sb.AppendLine($"{result.TeamA} Score: {result.TeamAScore}/{result.TeamBWickets} (Batting: {result.TeamABattingRuns}, Extras: {result.TeamAExtras})");
-            sb.AppendLine($"{result.TeamB} Score: {result.TeamBScore}/{result.TeamAWickets} (Batting: {result.TeamBBattingRuns}, Extras: {result.TeamBExtras})");
+            sb.AppendLine($"{result.TeamA} Score: {result.TeamAScore}/{result.TeamAWickets} (Batting: {result.TeamABattingRuns}, Extras: {result.TeamAExtras})");
+            sb.AppendLine($"{result.TeamB} Score: {result.TeamBScore}/{result.TeamBWickets} (Batting: {result.TeamBBattingRuns}, Extras: {result.TeamBExtras})");
             sb.AppendLine();
 
             sb.AppendLine($"{result.TeamA}  Bowling Summary:");

@@ -16,12 +16,12 @@ public partial class SummaryPage : ContentPage
         ScoreSummaryLabel.Text = $"{matchResult.TeamA}: {matchResult.TeamAScore}  {matchResult.TeamB}: {matchResult.TeamBScore}";
 
         TeamAHeader.Text = $"{matchResult.TeamA} Summary";
-        TeamAScoreLabel.Text = $"Score: {matchResult.TeamAScore}/{matchResult.TeamBWickets} (Batting {matchResult.TeamABattingRuns}, Extras {matchResult.TeamAExtras})";
+        TeamAScoreLabel.Text = $"Score: {matchResult.TeamAScore}/{matchResult.TeamAWickets} (Batting {matchResult.TeamABattingRuns}, Extras {matchResult.TeamAExtras})";
         TeamAPairStatsList.ItemsSource = matchResult.TeamABattingPairs;
         TeamABowlerStatsList.ItemsSource = matchResult.TeamBBowlingStats.OrderBy(x=>x.Bowler); // Team B bowled to Team A
 
         TeamBHeader.Text = $"{matchResult.TeamB} Summary";
-        TeamBScoreLabel.Text = $"Score: {matchResult.TeamBScore}/{matchResult.TeamAWickets} (Batting {matchResult.TeamBBattingRuns}, Extras {matchResult.TeamBExtras})";
+        TeamBScoreLabel.Text = $"Score: {matchResult.TeamBScore}/{matchResult.TeamBWickets} (Batting {matchResult.TeamBBattingRuns}, Extras {matchResult.TeamBExtras})";
         TeamBPairStatsList.ItemsSource = matchResult.TeamBBattingPairs;
         TeamBBowlerStatsList.ItemsSource = matchResult.TeamABowlingStats.OrderBy(x => x.Bowler); // Team A bowled to Team B
     }
